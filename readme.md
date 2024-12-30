@@ -1,6 +1,6 @@
 ## Instruction
-- The code is used for calibrating $^{tracker}T_{Link3}$ and DH parameters of lats-three links based on the tracker data and kinematics of last-three joints.
-- We denote every set of fixed first-three joints as a **group**. Each **group** relates to a $^{tracker}T_{Link3}$.
+- The code is used for calibrating $^{tracker}T_{Link3}$ and DH parameters of last-three links based on the tracker data and robot kinematics.
+- We denote each set of fixed first-three joints as a **group**. Each **group** relates to a $^{tracker}T_{Link3}$.
 - In our code, we use ```visual_kinematics``` to compute the forward-kinematics, please adjust the DH parameter in the code if you want to adapt the code to your own robot.
 
 
@@ -59,7 +59,7 @@ Before running the code, use ```pip``` to install the following libraries.
 
 ``` 
 
-- Hand-eye calibration based on $^{tracker}T_{Link3}$s and new DH parameters:
+- Hand-eye calibration based on $^{tracker}T_{Link3}$ of each group and new DH parameters:
 ```
 .
 ├── handeye_6DoF.py
@@ -79,7 +79,7 @@ Before running the code, use ```pip``` to install the following libraries.
 
 ``` 
 
-- Evaluate the accuracy
+- Evaluate the accuracy, download the test_data in this [Link](https://hkclr-my.sharepoint.com/:u:/g/personal/tyhuang_hkclr_hk/EfGZLp1JI8ZGndlROqBqGj8BGKlApr0idKCS-i7QTSZ0CQ).
 ```
 .
 ├── 6DoF_vs_newkin.py
@@ -90,5 +90,5 @@ Before running the code, use ```pip``` to install the following libraries.
         ├── $time2$_2DImage.png
         ├── $time2$_textured.ply
         ├── ...
-    ├── robot_data.txt             ### each line records the joint states
+    ├── robot_data.txt       ### each line records the joint states
 ```
