@@ -8,10 +8,33 @@
 
 Before running the code, use ```pip``` to install the following libraries.
 - pandas
+```
+pip install pandas
+```
+
 - open3d
 - torch
+```
+pip3 install torch==1.12.1+cu113 torchvision==0.13.1+cu113 torchaudio==0.12.1 --extra-index-url https://download.pytorch.org/whl/cu113
+```
+or
+```
+pip3 --no-cache-dir install torch==2.4.1+cu124 torchvision==0.19.1+cu124 --extra-index-url https://download.pytorch.org/whl/cu124
+python -m torch.utils.collect_env
+python -c "import torch; print(torch.cuda.is_available())"
+```
+
 - opencv-python
+
 - visual_kinematics
+```
+pip3 install visual-kinematics
+```
+
+- RoMa
+```
+pip3 install roma
+```
 
 ### Usage
 
