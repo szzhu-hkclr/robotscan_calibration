@@ -126,7 +126,7 @@ if __name__ == '__main__':
     marker_points = []
     for group, i in zip(group_lists, range(group_num)):
         file_path = os.path.join(trackerdata_folder, group + ".csv")
-        tracker_data = pd.read_csv(file_path, sep = ';')
+        tracker_data = pd.read_csv(file_path, sep = ';', encoding='unicode_escape')
         X = tracker_data['X  [mm]'].to_list()
         Y = tracker_data['Y  [mm]'].to_list()
         Z = tracker_data['Z  [mm]'].to_list()
