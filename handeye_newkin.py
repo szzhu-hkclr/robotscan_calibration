@@ -118,7 +118,7 @@ def compute_camera_poses(chessboard_corners, pattern_size, square_size, intrinsi
     return RTarget2Cam, TTarget2Cam
 
 
-def read_aubo_joints(file):
+def read_joints(file):
     endposes = []
     with open(file, "r") as f:
         for line in f.readlines():
@@ -135,13 +135,18 @@ def read_aubo_joints(file):
 
     return endposes
 
+Setup603 = True
 num_group = 6
 group_lists = ["group1", "group2", "group3", "group4", "group5", "group6"]
 
 
 posefile_path = "./aT3s_opt.npy"
-image_folder = "./handeye_data/data_images"
-pose_folder = "./handeye_data/data_robot"
+if Setup603:
+    image_folder = "./handeye_data/data_images"
+    pose_folder = "./handeye_data/data_robot"
+else:
+    image_folder = "./handeye_data/data_photoneo"
+    pose_folder = "./handeye_data/data_nachi"
 
 images = []
 for group in group_lists:
@@ -150,7 +155,10 @@ for group in group_lists:
     images.extend(images_group)
 
 pattern_size = (11, 8)
-square_size = 10 / 1000
+if Setup603:
+    square_size = 10 / 1000
+else:
+    square_size = 15 / 1000
 ShowProjectError = True
 ShowCorners = False
 
@@ -171,21 +179,35 @@ RTarget2Cam, TTarget2Cam = compute_camera_poses(chessboard_corners, pattern_size
 
 REnd2Base = []
 TEnd2Base = []
-dh_params = np.array([[0.1632, 0., 0.5 * pi, 0.],
-                      [0., 0.647, pi, 0.5 * pi],
-                      [0., 0.6005, pi, 0.],
-                      [2.0132992e-01, 1.5028477e-05, -1.5706592e+00, -1.5707269e+00],
-                      [1.02672115e-01, 4.72186694e-05, 1.57062984e+00, -2.43247976e-03],
-                      [9.4024345e-02, 8.5766565e-05, -7.1511102e-05, -8.5101266e-05]])
 
-robot_aubo = RobotSerial(dh_params)
+if Setup603:
+    # aubo i10
+    dh_params = np.array([[0.1632, 0., 0.5 * pi, 0.],
+                        [0., 0.647, pi, 0.5 * pi],
+                        [0., 0.6005, pi, 0.],
+                        [2.0132992e-01, 1.5028477e-05, -1.5706592e+00, -1.5707269e+00],
+                        [1.02672115e-01, 4.72186694e-05, 1.57062984e+00, -2.43247976e-03],
+                        [9.4024345e-02, 8.5766565e-05, -7.1511102e-05, -8.5101266e-05]])
+else:
+    # nachi mz25
+                            # |  d  |  a  |  alpha  |  theta  |
+    dh_params = np.array([
+                            [ 0.2495,  0,      0.5 * pi,  0],        # Joint 1
+                            [ 0.3005,  0.17,   0,         0.5 * pi], # Joint 2
+                            [ 0.88,    0.157,  0.5 * pi,  0],        # Joint 3
+                            [ 0.19,    0.81,  -0.5 * pi,  0],        # Joint 4
+                            [ 0,       0,      0.5 * pi,  0],        # Joint 5
+                            [ 0,       0.101,  0,         0]         # Joint 6
+                        ])
+robot = RobotSerial(dh_params)
+
 for group, i in zip(group_lists, range(num_group)):
     pose_file = f'{pose_folder}/{group}.txt'
-    pose_group = read_aubo_joints(pose_file)
+    pose_group = read_joints(pose_file)
 
     for pose in pose_group:
-        f = robot_aubo.forward(np.array(pose))
-        Ts = robot_aubo.ts
+        f = robot.forward(np.array(pose))
+        Ts = robot.ts
         Link3TEnd_i = np.eye(4)
         for j in range(3, 6):
             Link3TEnd_i = Link3TEnd_i.dot(Ts[j].t_4_4)

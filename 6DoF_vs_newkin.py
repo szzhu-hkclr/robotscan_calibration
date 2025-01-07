@@ -148,9 +148,14 @@ def compute_transformation_diff(R_est, t_est, R_gt, t_gt):
 
 
 if __name__ == '__main__':
+    Setup603 = True
 
-    image_folder = "./test_data/image_data"
-    robotfile_path = os.path.join("./test_data/robot_data.txt")
+    if Setup603:
+        image_folder = "./evaluate_data/603_data/image_data"
+        robotfile_path = os.path.join("./evaluate_data/603_data/robot_data.txt")
+    else:
+        image_folder = "./evaluate_data/16w_data/image_data"
+        robotfile_path = os.path.join("./evaluate_data/16w_data/robot_data.txt")
 
     images = []
     image_files = sorted(glob.glob(f'{image_folder}/*_2DImage.png'))
@@ -160,16 +165,28 @@ if __name__ == '__main__':
     ply_files = sorted(glob.glob(f'{image_folder}/*_textured.ply'))
 
     pattern_size = (11, 8)
-    square_size = 10 / 1000
+    if Setup603:
+        square_size = 10 / 1000
+    else:    
+        square_size = 15 / 1000
+
     ShowProjectError = True
     ShowCorners = False
 
     # camera calibration
     chessboard_corners, IndexWithImg = find_chessboard_corners(images, pattern_size, ShowCorners=ShowCorners)
 
-    intrinsic_matrix = np.array([[2.28169027e+03, 0.00000000e+00, 1.40720528e+03],
-                                 [0.00000000e+00, 2.28099962e+03, 8.93295531e+02],
-                                 [0.00000000e+00, 0.00000000e+00, 1.00000000e+00]])
+    if Setup603:
+        # mecheye nano ultra
+        intrinsic_matrix = np.array([[2.28169027e+03, 0.00000000e+00, 1.40720528e+03],
+                                    [0.00000000e+00, 2.28099962e+03, 8.93295531e+02],
+                                    [0.00000000e+00, 0.00000000e+00, 1.00000000e+00]])
+    else:
+        # photoneo model s
+        intrinsic_matrix = np.array([[2.28169027e+03, 0.00000000e+00, 1.40720528e+03],
+                                     [0.00000000e+00, 2.28099962e+03, 8.93295531e+02],
+                                     [0.00000000e+00, 0.00000000e+00, 1.00000000e+00]])
+
 
     dist = np.array([[-7.14967118e-03, -1.69424563e-03, -4.70604299e-05, -2.47795750e-04, 4.36516991e-02]])
 
@@ -185,7 +202,12 @@ if __name__ == '__main__':
         ply_file = ply_files[idx + 1]
         pointcloud_2 = o3d.io.read_point_cloud(ply_file)
         K = cam1_T_camidx.copy()
-        K[:3, 3] = 1000.0 * K[:3, 3]
+        if Setup603:
+            # scales the translation vector from meters to millimeters
+            K[:3, 3] = 1000.0 * K[:3, 3]
+        else:
+            # No scaling needed when point cloud is in meters
+            K[:3, 3] = K[:3, 3]
         pointcloud_2_calib = copy.deepcopy(pointcloud_2).transform(K)
         new_ply_file = ply_file.replace(".ply", "_trans_cam.ply")
         o3d.io.write_point_cloud(new_ply_file, pointcloud_2_calib)
@@ -209,25 +231,40 @@ if __name__ == '__main__':
 
 
     ###  6-DoF Kinematics
-
-    dh_params = np.array([[0.1632, 0., 0.5 * pi, 0.],
-                          [0., 0.647, pi, 0.5 * pi],
-                          [0., 0.6005, pi, 0.],
-                          [0.2013, 0., -0.5 * pi, -0.5 * pi],
-                          [0.1025, 0., 0.5 * pi, 0.],
-                          [0.094, 0., 0., 0.]])
-    robot_aubo_ori = RobotSerial(dh_params)
-
-    end_T_cam_ori = np.array([[9.99994962e-01, 5.77411071e-04, -3.12120952e-03, 0.04256417],
-                             [-5.59361481e-04, 9.99983135e-01, 5.78066586e-03, 0.00681424],
-                             [3.12449470e-03, -5.77889085e-03, 9.99978421e-01, 0.12986917],
-                             [0, 0, 0, 1]])
-
+    if Setup603:
+        # aubo i10
+        dh_params = np.array([[0.1632, 0., 0.5 * pi, 0.],
+                            [0., 0.647, pi, 0.5 * pi],
+                            [0., 0.6005, pi, 0.],
+                            [0.2013, 0., -0.5 * pi, -0.5 * pi],
+                            [0.1025, 0., 0.5 * pi, 0.],
+                            [0.094, 0., 0., 0.]])
+        end_T_cam_ori = np.array([[9.99994962e-01, 5.77411071e-04, -3.12120952e-03, 0.04256417],
+                                [-5.59361481e-04, 9.99983135e-01, 5.78066586e-03, 0.00681424],
+                                [3.12449470e-03, -5.77889085e-03, 9.99978421e-01, 0.12986917],
+                                [0, 0, 0, 1]])
+    else:
+        # nachi mz25
+                                # |  d  |  a  |  alpha  |  theta  |
+        dh_params = np.array([
+                                [ 0.2495,  0,      0.5 * pi,  0],        # Joint 1
+                                [ 0.3005,  0.17,   0,         0.5 * pi], # Joint 2
+                                [ 0.88,    0.157,  0.5 * pi,  0],        # Joint 3
+                                [ 0.19,    0.81,  -0.5 * pi,  0],        # Joint 4
+                                [ 0,       0,      0.5 * pi,  0],        # Joint 5
+                                [ 0,       0.101,  0,         0]         # Joint 6
+                             ])
+        end_T_cam_ori = np.array([[9.99994962e-01, 5.77411071e-04, -3.12120952e-03, 0.04256417],
+                                 [-5.59361481e-04, 9.99983135e-01, 5.78066586e-03, 0.00681424],
+                                 [3.12449470e-03, -5.77889085e-03, 9.99978421e-01, 0.12986917],
+                                 [0, 0, 0, 1]])
+    robot_ori = RobotSerial(dh_params)
+    
     base_T_camidxs = []
     for idx in range(len(robot_states)):
         robot_state = robot_states[idx]
-        f = robot_aubo_ori.forward(np.array(robot_state))
-        base_T_camidx = robot_aubo_ori.end_frame.t_4_4.dot(end_T_cam_ori)
+        f = robot_ori.forward(np.array(robot_state))
+        base_T_camidx = robot_ori.end_frame.t_4_4.dot(end_T_cam_ori)
         base_T_camidxs.append(base_T_camidx)
 
     base_T_cam1 = base_T_camidxs[0]
@@ -253,7 +290,7 @@ if __name__ == '__main__':
                           [2.0132992e-01, 1.5028477e-05, -1.5706592e+00, -1.5707269e+00],
                           [1.02672115e-01, 4.72186694e-05, 1.57062984e+00, -2.43247976e-03],
                           [9.4024345e-02, 8.5766565e-05, -7.1511102e-05, -8.5101266e-05]])
-    robot_aubo_new = RobotSerial(dh_params_new)
+    robot_new = RobotSerial(dh_params_new)
 
     # tracker_T_3 poses
     posefile_path = "./aT3s_opt.npy"
@@ -267,9 +304,9 @@ if __name__ == '__main__':
     tracker_T_camidxs = []
     for idx in range(len(robot_states)):
         robot_state = robot_states[idx]
-        f = robot_aubo_new.forward(np.array(robot_state))
+        f = robot_new.forward(np.array(robot_state))
 
-        Ts = robot_aubo_new.ts
+        Ts = robot_new.ts
         Link3TEnd_i = np.eye(4)
         for j in range(3, 6):
             Link3TEnd_i = Link3TEnd_i.dot(Ts[j].t_4_4)
@@ -307,9 +344,14 @@ if __name__ == '__main__':
         error_R_K3DoF, error_t_K3DoF = compute_transformation_diff(K3DoF_cam1_T_cami[:3, :3], K3DoF_cam1_T_cami[:3, 3:], cam_cam1_T_cami[:3, :3], cam_cam1_T_cami[:3, 3:])
 
         errors_R_K6DoF.append(error_R_K6DoF)
-        errors_t_K6DoF.append(error_t_K6DoF * 1000)
         errors_R_K3DoF.append(error_R_K3DoF)
-        errors_t_K3DoF.append(error_t_K3DoF * 1000)
+        if Setup603:
+            errors_t_K6DoF.append(error_t_K6DoF * 1000)
+            errors_t_K3DoF.append(error_t_K3DoF * 1000)
+        else:
+            # No scaling needed when point cloud is in meters
+            errors_t_K6DoF.append(error_t_K6DoF)
+            errors_t_K3DoF.append(error_t_K3DoF)
 
     plt.subplot(2, 1, 1)
 
@@ -327,7 +369,11 @@ if __name__ == '__main__':
     plt.plot(range(len(errors_t_K6DoF)), errors_t_K6DoF, label="6DOF_t_error")
     plt.plot(range(len(errors_t_K3DoF)), errors_t_K3DoF, label="Ours_t_error")
     plt.title("Translation Error")
-    plt.ylim(0, 3)
+    if Setup603:
+        plt.ylim(0, 3)
+    else:
+        # update the ylim to a range that reflects meter-scale errors
+        plt.ylim(0, 0.003)
 
     plt.xlabel('Index')
     plt.ylabel('Error (mm)')

@@ -102,16 +102,24 @@ pip3 install roma
 
 ``` 
 
-- Evaluate the accuracy, download the test_data in this [Link](https://hkclr-my.sharepoint.com/:u:/g/personal/tyhuang_hkclr_hk/EfGZLp1JI8ZGndlROqBqGj8BGKlApr0idKCS-i7QTSZ0CQ).
+- Evaluate the accuracy, download the 16w_data in this [Link](https://hkclr-my.sharepoint.com/:u:/g/personal/tyhuang_hkclr_hk/EfGZLp1JI8ZGndlROqBqGj8BGKlApr0idKCS-i7QTSZ0CQ).
 ```
 .
-├── 6DoF_vs_newkin.py
-├── test_data
-    ├── image_data       
-        ├── $time1$_2DImage.png
-        ├── $time1$_textured.ply
-        ├── $time2$_2DImage.png
-        ├── $time2$_textured.ply
-        ├── ...
-    ├── robot_data.txt       ### each line records the joint states
+├── evaluate_data
+│   ├── 16w_data
+│   │   └── image_data
+            ├── $time1$_2DImage.png
+            ├── $time1$_textured.ply
+            ├── $time2$_2DImage.png
+            ├── $time2$_textured.ply
+            ├── ...
+        ├── robot_data.txt       ### each line records the joint states
+│   └── 603_data
+│   │   └── image_data
+            ├── $time1$_2DImage.png
+            ├── $time1$_textured.ply
+            ├── $time2$_2DImage.png
+            ├── $time2$_textured.ply
+            ├── ...
+        ├── robot_data.txt       ### each line records the joint states     
 ```

@@ -204,28 +204,48 @@ def solve_3Ta_R(est_3Ta_t_iter, est_6p_iter, Link3TEnds, marker_points):
 
 
 if __name__ == "__main__":
+    Setup603 = True
 
     N_group = 6
-    trackerdata_folder = "./calib_aT3_data/data_leika"
-    robotdata_folder = "./calib_aT3_data/data_robot"
     group_lists = ["group1", "group2", "group3", "group4", "group5", "group6"]
     threshold = 0.00024                                                            ### maybe need to be adjusted
+    if Setup603:
+        trackerdata_folder = "./calib_aT3_data/data_leika"
+        robotdata_folder = "./calib_aT3_data/data_robot"
+    else:
+        trackerdata_folder = "./calib_aT3_data/data_ndi"
+        robotdata_folder = "./calib_aT3_data/data_nachi"
 
-    # robot parameters
-    dh_params = np.array([[0.1632, 0., 0.5 * pi, 0.],
-                          [0., 0.647, pi, 0.5 * pi],
-                          [0., 0.6005, pi, 0.],
-                          [0.2013, 0., -0.5 * pi, -0.5 * pi],
-                          [0.1025, 0., 0.5 * pi, 0.],
-                          [0.094, 0., 0., 0.]])
-    robot_aubo = RobotSerial(dh_params)
+    if Setup603:
+        # aubo i10
+        dh_params = np.array([[0.1632, 0., 0.5 * pi, 0.],
+                            [0., 0.647, pi, 0.5 * pi],
+                            [0., 0.6005, pi, 0.],
+                            [0.2013, 0., -0.5 * pi, -0.5 * pi],
+                            [0.1025, 0., 0.5 * pi, 0.],
+                            [0.094, 0., 0., 0.]])
+    else:
+        # nachi mz25
+                                # |  d  |  a  |  alpha  |  theta  |
+        dh_params = np.array([
+                                [ 0.2495,  0,      0.5 * pi,  0],        # Joint 1
+                                [ 0.3005,  0.17,   0,         0.5 * pi], # Joint 2
+                                [ 0.88,    0.157,  0.5 * pi,  0],        # Joint 3
+                                [ 0.19,    0.81,  -0.5 * pi,  0],        # Joint 4
+                                [ 0,       0,      0.5 * pi,  0],        # Joint 5
+                                [ 0,       0.101,  0,         0]         # Joint 6
+                            ])
+    robot = RobotSerial(dh_params)
 
     # tracker data
     marker_points = []
 
     for group in group_lists:
         file_path = os.path.join(trackerdata_folder, group + ".csv")
-        tracker_data = pd.read_csv(file_path, sep = ';', encoding='unicode_escape')
+        if Setup603:
+            tracker_data = pd.read_csv(file_path, sep = ';', encoding='unicode_escape')
+        else:
+            tracker_data = pd.read_csv(file_path, sep = ',', encoding='unicode_escape')
         X = tracker_data['X  [mm]'].to_list()
         Y = tracker_data['Y  [mm]'].to_list()
         Z = tracker_data['Z  [mm]'].to_list()
@@ -250,9 +270,9 @@ if __name__ == "__main__":
                         data = data.replace(",", "")
                         state.append(float(data))
 
-                    f = robot_aubo.forward(np.array(state))
+                    f = robot.forward(np.array(state))
 
-                    Ts = robot_aubo.ts
+                    Ts = robot.ts
                     Link3TEnd_i = np.eye(4)
                     for j in range(3, 6):
                         Link3TEnd_i = Link3TEnd_i.dot(Ts[j].t_4_4)
