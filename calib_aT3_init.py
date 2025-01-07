@@ -204,19 +204,15 @@ def solve_3Ta_R(est_3Ta_t_iter, est_6p_iter, Link3TEnds, marker_points):
 
 
 if __name__ == "__main__":
-    Setup603 = True
+    Setup603 = False
 
-    N_group = 6
-    group_lists = ["group1", "group2", "group3", "group4", "group5", "group6"]
+    N_group = 0
+    group_lists = []
     threshold = 0.00024                                                            ### maybe need to be adjusted
     if Setup603:
         trackerdata_folder = "./calib_aT3_data/data_leika"
         robotdata_folder = "./calib_aT3_data/data_robot"
-    else:
-        trackerdata_folder = "./calib_aT3_data/data_ndi"
-        robotdata_folder = "./calib_aT3_data/data_nachi"
-
-    if Setup603:
+        group_lists = ["group1", "group2", "group3", "group4", "group5", "group6"]
         # aubo i10
         dh_params = np.array([[0.1632, 0., 0.5 * pi, 0.],
                             [0., 0.647, pi, 0.5 * pi],
@@ -225,6 +221,9 @@ if __name__ == "__main__":
                             [0.1025, 0., 0.5 * pi, 0.],
                             [0.094, 0., 0., 0.]])
     else:
+        trackerdata_folder = "./calib_aT3_data/data_ndi"
+        robotdata_folder = "./calib_aT3_data/data_nachi"
+        group_lists = ["group1", "group2", "group3"]
         # nachi mz25
                                 # |  d  |  a  |  alpha  |  theta  |
         dh_params = np.array([
@@ -235,6 +234,8 @@ if __name__ == "__main__":
                                 [ 0,       0,      0.5 * pi,  0],        # Joint 5
                                 [ 0,       0.101,  0,         0]         # Joint 6
                             ])
+
+    N_group = len(group_lists)
     robot = RobotSerial(dh_params)
 
     # tracker data

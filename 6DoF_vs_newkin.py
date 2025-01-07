@@ -148,7 +148,7 @@ def compute_transformation_diff(R_est, t_est, R_gt, t_gt):
 
 
 if __name__ == '__main__':
-    Setup603 = True
+    Setup603 = False
 
     if Setup603:
         image_folder = "./evaluate_data/603_data/image_data"

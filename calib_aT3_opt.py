@@ -81,19 +81,24 @@ def kinematic_forward_eachgroup(pose_group_i, DH_link_4, DH_link_5, DH_link_6, m
 
 
 if __name__ == '__main__':
-    Setup603 = True
+    Setup603 = False
 
     torch.set_printoptions(precision=10)
     init_6p_file = "p_init.npy"
     init_Ts_file = "aT3s_init.npy"
+
+    group_lists = []
+
     if Setup603:
         trackerdata_folder = "./calib_aT3_data/data_leika"
         robotdata_folder = "./calib_aT3_data/data_robot"
+        group_lists = ["group1", "group2", "group3", "group4", "group5", "group6"]
     else:
         trackerdata_folder = "./calib_aT3_data/data_ndi"
         robotdata_folder = "./calib_aT3_data/data_nachi"
-    group_num = 6
-    group_lists = ["group1", "group2", "group3", "group4", "group5", "group6"]
+        group_lists = ["group1", "group2", "group3"]
+    
+    group_num = len(group_lists)
     num_sample_each = [20, 20, 20, 20, 20, 13]
 
 

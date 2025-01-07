@@ -148,21 +148,22 @@ def read_joints(file):
 
     return endposes
 
-Setup603 = True
-group_lists = ["group1", "group2", "group3", "group4", "group5", "group6"]
+Setup603 = False
+group_lists = []
 
 if Setup603:
     image_folder = "./handeye_data/data_images"
     pose_folder = "./handeye_data/data_robot"
+    group_lists = ["group1", "group2", "group3", "group4", "group5", "group6"]
+    square_size = 10 / 1000
 else:
     image_folder = "./handeye_data/data_photoneo"
     pose_folder = "./handeye_data/data_nachi"
+    group_lists = ["group1", "group2", "group3"]
+    square_size = 15 / 1000
 
 pattern_size = (11, 8)
-if Setup603:
-    square_size = 10 / 1000
-else:
-    square_size = 15 / 1000
+
 ShowProjectError = True
 ShowCorners = False
 

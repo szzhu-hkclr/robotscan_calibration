@@ -135,19 +135,22 @@ def read_joints(file):
 
     return endposes
 
-Setup603 = True
-num_group = 6
-group_lists = ["group1", "group2", "group3", "group4", "group5", "group6"]
+Setup603 = False
+num_group = 0
+group_lists = []
 
 
 posefile_path = "./aT3s_opt.npy"
 if Setup603:
     image_folder = "./handeye_data/data_images"
     pose_folder = "./handeye_data/data_robot"
+    group_lists = ["group1", "group2", "group3", "group4", "group5", "group6"]
 else:
     image_folder = "./handeye_data/data_photoneo"
     pose_folder = "./handeye_data/data_nachi"
+    group_lists = ["group1", "group2", "group3"]
 
+num_group = len(group_lists)
 images = []
 for group in group_lists:
     image_files = sorted(glob.glob(f'{image_folder}/{group}/*.png'))
