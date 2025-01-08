@@ -204,12 +204,14 @@ def solve_3Ta_R(est_3Ta_t_iter, est_6p_iter, Link3TEnds, marker_points):
 
 
 if __name__ == "__main__":
+    # Setup603 = True
     Setup603 = False
 
     N_group = 0
     group_lists = []
     threshold = 0.00024                                                            ### maybe need to be adjusted
     if Setup603:
+        threshold = 0.00024
         trackerdata_folder = "./calib_aT3_data/data_leika"
         robotdata_folder = "./calib_aT3_data/data_robot"
         group_lists = ["group1", "group2", "group3", "group4", "group5", "group6"]
@@ -221,48 +223,109 @@ if __name__ == "__main__":
                             [0.1025, 0., 0.5 * pi, 0.],
                             [0.094, 0., 0., 0.]])
     else:
+        threshold = 1
         trackerdata_folder = "./calib_aT3_data/data_ndi"
         robotdata_folder = "./calib_aT3_data/data_nachi"
         group_lists = ["group1", "group2", "group3"]
         # nachi mz25
                                 # |  d  |  a  |  alpha  |  theta  |
-        dh_params = np.array([
-                                [ 0.2495,  0,      0.5 * pi,  0],        # Joint 1
-                                [ 0.3005,  0.17,   0,         0.5 * pi], # Joint 2
-                                [ 0.88,    0.157,  0.5 * pi,  0],        # Joint 3
-                                [ 0.19,    0.81,  -0.5 * pi,  0],        # Joint 4
-                                [ 0,       0,      0.5 * pi,  0],        # Joint 5
-                                [ 0,       0.101,  0,         0]         # Joint 6
-                            ])
+        # dh_params = np.array([
+        #                         [ 0.2495,  0,      0.5 * pi,  0],        # Joint 1
+        #                         [ 0.3005,  0.17,   0,         0.5 * pi], # Joint 2
+        #                         [ 0.88,    0.157,  0.5 * pi,  0],        # Joint 3
+        #                         [ 0.19,    0.81,  -0.5 * pi,  0],        # Joint 4
+        #                         [ 0,       0,      0.5 * pi,  0],        # Joint 5
+        #                         [ 0,       0.101,  0,         0]         # Joint 6
+        #                     ])
 
+        # dh_params = np.array([[0.2495, 0.0, 0.5 * np.pi, 0.],   # Joint 1
+        #               [0.0, 0.1705, 0.0, 0.5 * np.pi], # Joint 2
+        #               [0.3005, 0.0, -0.5 * np.pi, 0.], # Joint 3
+        #               [0.88, 0.0, 0.5 * np.pi, -0.5 * np.pi], # Joint 4
+        #               [0.19, 0.0, 0.0, 0.],             # Joint 5
+        #               [0.0, 0.0, 0.0, 0.]])             # Joint 6
+        
+        # dh_params = np.array([
+        #                         [0.2495, 0,      0,      0.],
+        #                         [0.157,  0.17,   -pi/2,  0.],
+        #                         [0.88,   0.157,  0,      0.],
+        #                         [0.19,   0.81,   -pi/2,  0.],
+        #                         [0,      0,      pi/2,   0.],
+        #                         [0,      0.101,  0,      0.]
+        #                     ])
+        
+
+        dh_params = np.array([
+            [0.2495, 0.0, 0.0, 0],          # Joint 1
+            [0.0, 0.17, -np.pi / 2, 0],     # Joint 2
+            [0.88, 0.157, np.pi / 2, 0],    # Joint 3
+            [0.19, 0.81, 0, 0],              # Joint 4
+            [0.0, 0.0, 0, 0],       # Joint 5
+            [0.0, 0.101, 0, 0]               # Joint 6
+        ])
+
+        # each Z axis along revolute axis
+        # dh_params = np.array([
+        #     [0.2495, 0.0, 0.0, 0],          # Joint 1
+        #     [0.0, 0.17, np.pi / 2, np.pi / 2],     # Joint 2
+        #     [0.88, 0.157, 0, 0],    # Joint 3
+        #     [0.81, 0.19, 0, 0],              # Joint 4
+        #     [0.0, 0.0, 0, 0],       # Joint 5
+        #     [0.0, 0.101, np.pi / 2, 0]               # Joint 6
+        # ])
+
+        # dh_params = np.array([
+        #     [0.2495, 0.0, 0.0, 0.0],         # Joint 1
+        #     [0.0, 0.17, -np.pi/2, 0.0],      # Joint 2
+        #     [0.0, 0.157, np.pi/2, 0.0],      # Joint 3
+        #     [0.19, 0.81, 0.0, 0.0],          # Joint 4
+        #     [0.0, 0.0, -np.pi/2, 0.0],       # Joint 5
+        #     [0.0, 0.101, 0.0, 0.0]           # Joint 6
+        # ])
+
+
+
+        
     N_group = len(group_lists)
     robot = RobotSerial(dh_params)
 
     # tracker data
     marker_points = []
-
     for group in group_lists:
-        file_path = os.path.join(trackerdata_folder, group + ".csv")
         if Setup603:
-            tracker_data = pd.read_csv(file_path, sep = ';', encoding='unicode_escape')
-        else:
+            file_path = os.path.join(trackerdata_folder, group + ".csv")
             tracker_data = pd.read_csv(file_path, sep = ',', encoding='unicode_escape')
-        X = tracker_data['X  [mm]'].to_list()
-        Y = tracker_data['Y  [mm]'].to_list()
-        Z = tracker_data['Z  [mm]'].to_list()
-
-        marker_points.extend([[X_i, Y_i, Z_i] for X_i, Y_i, Z_i in zip(X, Y, Z)])
+            X = tracker_data['X  [mm]'].to_list()
+            Y = tracker_data['Y  [mm]'].to_list()
+            Z = tracker_data['Z  [mm]'].to_list()
+            marker_points.extend([[X_i, Y_i, Z_i] for X_i, Y_i, Z_i in zip(X, Y, Z)])
+        else:
+            file_path = os.path.join(trackerdata_folder, group + ".txt")
+            with open(file_path, "r") as f:
+                for line in f.readlines():
+                    if line != "\n":
+                        line = line.strip('\n')  
+                        line_data = line.split(' ')
+                        marker_point = []
+                        for data in line_data[:3]:
+                            data = data.replace(",", "")
+                            marker_point.append(float(data))
+                        marker_points.append(marker_point)
 
 
     # robot data
     Link3TEnds = []
+    group_size = 0
+    sample_size = 0
     for group in group_lists:
+        group_size += 1
         file_path = os.path.join(robotdata_folder, group + ".txt")
         Link3TEnds_group = []
 
         with open(file_path, "r") as f:
             for line in f.readlines():
                 if line != "\n":
+                    sample_size += 1
                     line = line.strip('\n')
 
                     line_data = line.split(' ')
@@ -282,7 +345,8 @@ if __name__ == "__main__":
 
         Link3TEnds.extend(Link3TEnds_group)
 
-
+    assert sample_size % group_size == 0
+    sample_size_per_group = int(sample_size / group_size)
 
     est_6p_aver = np.zeros((1, 3))
     est_aT3s = []
@@ -294,8 +358,8 @@ if __name__ == "__main__":
         #     Link3TEnds_group = Link3TEnds[i*20:i*20 + 10]
         #     marker_points_group = marker_points[i * 20:i*20 + 10]
         # else:
-        Link3TEnds_group = Link3TEnds[i * 20:(i + 1) * 20]
-        marker_points_group = marker_points[i * 20:(i + 1) * 20]
+        Link3TEnds_group = Link3TEnds[i * sample_size_per_group:(i + 1) * sample_size_per_group]
+        marker_points_group = marker_points[i * sample_size_per_group:(i + 1) * sample_size_per_group]
 
 
         est_aT3, est_6p = solve_aT3_6p(Link3TEnds_group, marker_points_group, threshold)
