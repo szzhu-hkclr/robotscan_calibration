@@ -93,10 +93,19 @@ if __name__ == '__main__':
         trackerdata_folder = "./calib_aT3_data/data_leika"
         robotdata_folder = "./calib_aT3_data/data_robot"
         group_lists = ["group1", "group2", "group3", "group4", "group5", "group6"]
+        # d  a  alpha  theta
+        DH_link_4 = Variable(torch.tensor([0.2013, 0., -0.5 * np.pi, -0.5 * np.pi], requires_grad=True).cuda())
+        DH_link_5 = Variable(torch.tensor([0.1025, 0., 0.5 * np.pi, 0.], requires_grad=True).cuda())
+        DH_link_6 = Variable(torch.tensor([0.094, 0., 0., 0.], requires_grad=True).cuda())
     else:
         trackerdata_folder = "./calib_aT3_data/data_ndi"
         robotdata_folder = "./calib_aT3_data/data_nachi"
         group_lists = ["group1", "group2", "group3"]
+        # d  a  alpha  theta
+        DH_link_4 = Variable(torch.tensor([0.,        0.19,   np.pi / 2,  0.], requires_grad=True).cuda())
+        DH_link_5 = Variable(torch.tensor([0.81,      0.0,   -np.pi / 2,  0.], requires_grad=True).cuda())
+        DH_link_6 = Variable(torch.tensor([0.0,       0.0,    np.pi / 2,  0.], requires_grad=True).cuda())
+    
     
     group_num = len(group_lists)
     num_sample_each = [20, 20, 20, 20, 20, 13]
@@ -107,10 +116,6 @@ if __name__ == '__main__':
     marker_p = Variable(torch.tensor(ini_p.squeeze().tolist(), requires_grad=True).cuda())
 
 
-    # d  a  alpha  theta
-    DH_link_4 = Variable(torch.tensor([0.2013, 0., -0.5 * np.pi, -0.5 * np.pi], requires_grad=True).cuda())
-    DH_link_5 = Variable(torch.tensor([0.1025, 0., 0.5 * np.pi, 0.], requires_grad=True).cuda())
-    DH_link_6 = Variable(torch.tensor([0.094, 0., 0., 0.], requires_grad=True).cuda())
 
 
     # poses of joint_3 in each group

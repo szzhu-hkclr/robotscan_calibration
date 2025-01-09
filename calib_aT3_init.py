@@ -254,15 +254,14 @@ if __name__ == "__main__":
         #                         [0,      0.101,  0,      0.]
         #                     ])
         
-
-        dh_params = np.array([
-            [0.2495, 0.0, 0.0, 0],          # Joint 1
-            [0.0, 0.17, -np.pi / 2, 0],     # Joint 2
-            [0.88, 0.157, np.pi / 2, 0],    # Joint 3
-            [0.19, 0.81, 0, 0],              # Joint 4
-            [0.0, 0.0, 0, 0],       # Joint 5
-            [0.0, 0.101, 0, 0]               # Joint 6
-        ])
+        # dh_params = np.array([
+        #     [0.2495, 0.0, 0.0, 0],          # Joint 1
+        #     [0.0, 0.17, -np.pi / 2, 0],     # Joint 2
+        #     [0.88, 0.157, np.pi / 2, 0],    # Joint 3
+        #     [0.19, 0.81, 0, 0],              # Joint 4
+        #     [0.0, 0.0, 0, 0],       # Joint 5
+        #     [0.0, 0.101, 0, 0]               # Joint 6
+        # ])
 
         # each Z axis along revolute axis
         # dh_params = np.array([
@@ -283,7 +282,16 @@ if __name__ == "__main__":
         #     [0.0, 0.101, 0.0, 0.0]           # Joint 6
         # ])
 
-
+        # generated from openrave:
+          # |  d        |  a  |  alpha  |  theta  |
+        dh_params = np.array([
+            [0.2495,    0.0,    0.0,     0.],          
+            [0.3005,    0.17,   pi / 2,  0.],     
+            [0.,        0.88,   0.,      pi / 2],    
+            [0.,        0.19,   pi / 2,  0.],              
+            [0.81,      0.0,   -pi / 2,  0.],       
+            [0.0,       0.0,    pi / 2,  0.]               
+        ])
 
         
     N_group = len(group_lists)

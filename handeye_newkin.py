@@ -193,15 +193,16 @@ if Setup603:
                         [9.4024345e-02, 8.5766565e-05, -7.1511102e-05, -8.5101266e-05]])
 else:
     # nachi mz25
-                            # |  d  |  a  |  alpha  |  theta  |
+    # generated from openrave:
+          # |  d        |  a  |  alpha  |  theta  |
     dh_params = np.array([
-                            [ 0.2495,  0,      0.5 * pi,  0],        # Joint 1
-                            [ 0.3005,  0.17,   0,         0.5 * pi], # Joint 2
-                            [ 0.88,    0.157,  0.5 * pi,  0],        # Joint 3
-                            [ 0.19,    0.81,  -0.5 * pi,  0],        # Joint 4
-                            [ 0,       0,      0.5 * pi,  0],        # Joint 5
-                            [ 0,       0.101,  0,         0]         # Joint 6
-                        ])
+        [0.2495,    0.0,    0.0,     0.],          
+        [0.3005,    0.17,   pi / 2,  0.],     
+        [0.,        0.88,   0.,      pi / 2],    
+        [0.,        0.19,   pi / 2,  0.],              
+        [0.81,      0.0,   -pi / 2,  0.],       
+        [0.0,       0.0,    pi / 2,  0.]               
+    ])
 robot = RobotSerial(dh_params)
 
 for group, i in zip(group_lists, range(num_group)):
