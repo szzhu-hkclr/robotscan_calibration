@@ -198,15 +198,15 @@ if Setup603:
                         [0.094, 0., 0., 0.]])
 else:
     # nachi mz25
-    # generated from openrave:
-          # |  d        |  a  |  alpha  |  theta  |
+    # by yz:
+    #   |  d     |  a      | alpha  | theta|
     dh_params = np.array([
-        [0.2495,    0.0,    0.0,     0.],          
-        [0.3005,    0.17,   pi / 2,  0.],     
-        [0.,        0.88,   0.,      pi / 2],    
-        [0.,        0.19,   pi / 2,  0.],              
-        [0.81,      0.0,   -pi / 2,  0.],       
-        [0.0,       0.0,    pi / 2,  0.]               
+        [0.55,    0.17,     pi / 2,      0.],          
+        [0.,      0.88,     0.,      pi / 2],     
+        [0.,      0.19,     pi / 2,      0.],    
+        [0.81,    0.,      -pi / 2,      0.],              
+        [0.,      0.0,      pi / 2,      0.],       
+        [0.115,   0.0,      0.,          0.]               
     ])
 robot = RobotSerial(dh_params)
 

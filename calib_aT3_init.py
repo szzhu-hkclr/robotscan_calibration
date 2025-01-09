@@ -223,7 +223,7 @@ if __name__ == "__main__":
                             [0.1025, 0., 0.5 * pi, 0.],
                             [0.094, 0., 0., 0.]])
     else:
-        threshold = 1
+        threshold = 0.00024
         trackerdata_folder = "./calib_aT3_data/data_ndi"
         robotdata_folder = "./calib_aT3_data/data_nachi"
         group_lists = ["group1", "group2", "group3"]
@@ -284,15 +284,25 @@ if __name__ == "__main__":
 
         # generated from openrave:
           # |  d        |  a  |  alpha  |  theta  |
-        dh_params = np.array([
-            [0.2495,    0.0,    0.0,     0.],          
-            [0.3005,    0.17,   pi / 2,  0.],     
-            [0.,        0.88,   0.,      pi / 2],    
-            [0.,        0.19,   pi / 2,  0.],              
-            [0.81,      0.0,   -pi / 2,  0.],       
-            [0.0,       0.0,    pi / 2,  0.]               
-        ])
+        # dh_params = np.array([
+        #     [0.2495,    0.0,    0.0,     0.],          
+        #     [0.3005,    0.17,   pi / 2,  0.],     
+        #     [0.,        0.88,   0.,      pi / 2],    
+        #     [0.,        0.19,   pi / 2,  0.],              
+        #     [0.81,      0.0,   -pi / 2,  0.],       
+        #     [0.0,       0.0,    pi / 2,  0.]               
+        # ])
 
+        # by yz:
+        #   |  d     |  a      | alpha  | theta|
+        dh_params = np.array([
+            [0.55,    0.17,     pi / 2,      0.],          
+            [0.,      0.88,     0.,      pi / 2],     
+            [0.,      0.19,     pi / 2,      0.],    
+            [0.81,    0.,      -pi / 2,      0.],              
+            [0.,      0.0,      pi / 2,      0.],       
+            [0.115,   0.0,      0.,          0.]               
+        ])
         
     N_group = len(group_lists)
     robot = RobotSerial(dh_params)
