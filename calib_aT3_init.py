@@ -227,52 +227,8 @@ if __name__ == "__main__":
         trackerdata_folder = "./calib_aT3_data/data_ndi"
         robotdata_folder = "./calib_aT3_data/data_nachi"
         group_lists = ["group1", "group2", "group3"]
-        # nachi mz25
-                                # |  d  |  a  |  alpha  |  theta  |
-        # dh_params = np.array([
-        #                         [ 0.2495,  0,      0.5 * pi,  0],        # Joint 1
-        #                         [ 0.3005,  0.17,   0,         0.5 * pi], # Joint 2
-        #                         [ 0.88,    0.157,  0.5 * pi,  0],        # Joint 3
-        #                         [ 0.19,    0.81,  -0.5 * pi,  0],        # Joint 4
-        #                         [ 0,       0,      0.5 * pi,  0],        # Joint 5
-        #                         [ 0,       0.101,  0,         0]         # Joint 6
-        #                     ])
-
-        # dh_params = np.array([[0.2495, 0.0, 0.5 * np.pi, 0.],   # Joint 1
-        #               [0.0, 0.1705, 0.0, 0.5 * np.pi], # Joint 2
-        #               [0.3005, 0.0, -0.5 * np.pi, 0.], # Joint 3
-        #               [0.88, 0.0, 0.5 * np.pi, -0.5 * np.pi], # Joint 4
-        #               [0.19, 0.0, 0.0, 0.],             # Joint 5
-        #               [0.0, 0.0, 0.0, 0.]])             # Joint 6
+       
         
-        # dh_params = np.array([
-        #                         [0.2495, 0,      0,      0.],
-        #                         [0.157,  0.17,   -pi/2,  0.],
-        #                         [0.88,   0.157,  0,      0.],
-        #                         [0.19,   0.81,   -pi/2,  0.],
-        #                         [0,      0,      pi/2,   0.],
-        #                         [0,      0.101,  0,      0.]
-        #                     ])
-        
-        # dh_params = np.array([
-        #     [0.2495, 0.0, 0.0, 0],          # Joint 1
-        #     [0.0, 0.17, -np.pi / 2, 0],     # Joint 2
-        #     [0.88, 0.157, np.pi / 2, 0],    # Joint 3
-        #     [0.19, 0.81, 0, 0],              # Joint 4
-        #     [0.0, 0.0, 0, 0],       # Joint 5
-        #     [0.0, 0.101, 0, 0]               # Joint 6
-        # ])
-
-        # each Z axis along revolute axis
-        # dh_params = np.array([
-        #     [0.2495, 0.0, 0.0, 0],          # Joint 1
-        #     [0.0, 0.17, np.pi / 2, np.pi / 2],     # Joint 2
-        #     [0.88, 0.157, 0, 0],    # Joint 3
-        #     [0.81, 0.19, 0, 0],              # Joint 4
-        #     [0.0, 0.0, 0, 0],       # Joint 5
-        #     [0.0, 0.101, np.pi / 2, 0]               # Joint 6
-        # ])
-
         # dh_params = np.array([
         #     [0.2495, 0.0, 0.0, 0.0],         # Joint 1
         #     [0.0, 0.17, -np.pi/2, 0.0],      # Joint 2
@@ -286,21 +242,21 @@ if __name__ == "__main__":
           # |  d        |  a  |  alpha  |  theta  |
         # dh_params = np.array([
         #     [0.2495,    0.0,    0.0,     0.],          
-        #     [0.3005,    0.17,   pi / 2,  0.],     
-        #     [0.,        0.88,   0.,      pi / 2],    
-        #     [0.,        0.19,   pi / 2,  0.],              
-        #     [0.81,      0.0,   -pi / 2,  0.],       
-        #     [0.0,       0.0,    pi / 2,  0.]               
+        #     [0.3005,    0.17,   np.pi / 2,  0.],     
+        #     [0.,        0.88,   0.,      np.pi / 2],    
+        #     [0.,        0.19,   np.pi / 2,  0.],              
+        #     [0.81,      0.0,   -np.pi / 2,  0.],       
+        #     [0.0,       0.0,    np.pi / 2,  0.]               
         # ])
 
         # by yz:
         #   |  d     |  a      | alpha  | theta|
         dh_params = np.array([
-            [0.55,    0.17,     pi / 2,      0.],          
-            [0.,      0.88,     0.,      pi / 2],     
-            [0.,      0.19,     pi / 2,      0.],    
-            [0.81,    0.,      -pi / 2,      0.],              
-            [0.,      0.0,      pi / 2,      0.],       
+            [0.55,    0.17,     np.pi / 2,      0.],          
+            [0.,      0.88,     0.,      np.pi / 2],     
+            [0.,      0.19,     np.pi / 2,      0.],    
+            [0.81,    0.,      -np.pi / 2,      0.],              
+            [0.,      0.0,      np.pi / 2,      0.],       
             [0.115,   0.0,      0.,          0.]               
         ])
         
@@ -394,4 +350,3 @@ if __name__ == "__main__":
 
     np.save('aT3s_init.npy', est_aT3s)
     np.save('p_init.npy', est_6p_aver/float(N_group))
-

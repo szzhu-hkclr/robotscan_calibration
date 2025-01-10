@@ -12,25 +12,6 @@ dh_params = np.array([
     [0.115, 0.0, 0.0, 0.0]
 ])
 
-# dh_params = np.array([
-#     [0.2495, 0.0, 0.0, 0.0],         # Joint 1
-#     [0.0, 0.17, -np.pi/2, 0.0],      # Joint 2
-#     [0.0, 0.157, np.pi/2, 0.0],      # Joint 3
-#     [0.19, 0.81, 0.0, 0.0],          # Joint 4
-#     [0.0, 0.0, -np.pi/2, 0.0],       # Joint 5
-#     [0.0, 0.101, 0.0, 0.0]           # Joint 6
-# ])
-
-# generated from openrave:
-    # |  d        |  a  |  alpha  |  theta  |
-# dh_params = np.array([
-#     [0.2495,    0.0,    0.0,     0.],          
-#     [0.3005,    0.17,   np.pi / 2,  0.],     
-#     [0.,        0.88,   0.,      np.pi / 2],    
-#     [0.,        0.19,   np.pi / 2,  0.],              
-#     [0.81,      0.0,   -np.pi / 2,  0.],       
-#     [0.0,       0.0,    np.pi / 2,  0.]               
-# ])
 # Create a robot object using the DH parameters
 robot = RobotSerial(dh_params)
 
