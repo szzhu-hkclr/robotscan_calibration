@@ -97,18 +97,18 @@ if __name__ == '__main__':
         DH_link_4 = Variable(torch.tensor([0.2013, 0., -0.5 * np.pi, -0.5 * np.pi], requires_grad=True).cuda())
         DH_link_5 = Variable(torch.tensor([0.1025, 0., 0.5 * np.pi, 0.], requires_grad=True).cuda())
         DH_link_6 = Variable(torch.tensor([0.094, 0., 0., 0.], requires_grad=True).cuda())
+        num_sample_each = [20, 20, 20, 20, 20, 13]
     else:
         trackerdata_folder = "./calib_aT3_data/data_ndi"
         robotdata_folder = "./calib_aT3_data/data_nachi"
         group_lists = ["group1", "group2", "group3"]
         # d  a  alpha  theta
-        DH_link_4 = Variable(torch.tensor([0.,        0.19,   np.pi / 2,  0.], requires_grad=True).cuda())
-        DH_link_5 = Variable(torch.tensor([0.81,      0.0,   -np.pi / 2,  0.], requires_grad=True).cuda())
-        DH_link_6 = Variable(torch.tensor([0.0,       0.0,    np.pi / 2,  0.], requires_grad=True).cuda())
-    
+        DH_link_4 = Variable(torch.tensor([0.810, 0., -0.5 * np.pi, 0.00], requires_grad=True).cuda())
+        DH_link_5 = Variable(torch.tensor([0.0, 0., 0.5 * np.pi, 0.], requires_grad=True).cuda())
+        DH_link_6 = Variable(torch.tensor([0.115, 0., 0., 0.], requires_grad=True).cuda())
+        num_sample_each = [20, 20, 20]
     
     group_num = len(group_lists)
-    num_sample_each = [20, 20, 20, 20, 20, 13]
 
 
     # marker position
@@ -140,19 +140,36 @@ if __name__ == '__main__':
     # tracker data
     marker_points = []
     for group, i in zip(group_lists, range(group_num)):
-        file_path = os.path.join(trackerdata_folder, group + ".csv")
-        tracker_data = pd.read_csv(file_path, sep = ',', encoding='unicode_escape')
-        X = tracker_data['X  [mm]'].to_list()
-        Y = tracker_data['Y  [mm]'].to_list()
-        Z = tracker_data['Z  [mm]'].to_list()
+        if Setup603:
+            file_path = os.path.join(trackerdata_folder, group + ".csv")
+            tracker_data = pd.read_csv(file_path, sep = ',', encoding='unicode_escape')
+            X = tracker_data['X  [mm]'].to_list()
+            Y = tracker_data['Y  [mm]'].to_list()
+            Z = tracker_data['Z  [mm]'].to_list()
+            marker_points.extend([[X_i, Y_i, Z_i] for X_i, Y_i, Z_i in zip(X, Y, Z)])
+        else:
+            file_path = os.path.join(trackerdata_folder, group + ".txt")
+            with open(file_path, "r") as f:
+                lines = f.readlines()
+                # Parse the lines, skipping empty lines
+                parsed_lines = [
+                    [float(value.replace(",", "")) for value in line.split(",")[:3]]
+                    for line in lines if line.strip() != ""
+                ]
+                # Extract X, Y, Z coordinates and normalize
+                X = [line[0] / 1000.0 for line in parsed_lines]
+                Y = [line[1] / 1000.0 for line in parsed_lines]
+                Z = [line[2] / 1000.0 for line in parsed_lines]
 
-        marker_point_group = Variable(torch.from_numpy(np.array(
-            [[X_i / 1000.0, Y_i / 1000.0, Z_i / 1000.0] for X_i, Y_i, Z_i in
-             zip(X[:num_sample_each[i]],
-                 Y[:num_sample_each[i]],
-                 Z[:num_sample_each[i]])])).cuda())
+                # Create marker_point_group for this group
+                marker_point_group = Variable(torch.from_numpy(np.array(
+                    [[X_i, Y_i, Z_i] for X_i, Y_i, Z_i in
+                    zip(X[:num_sample_each[i]],
+                        Y[:num_sample_each[i]],
+                        Z[:num_sample_each[i]])]
+                ))).cuda()
 
-        marker_points.append(marker_point_group.float())
+                marker_points.append(marker_point_group.float())
 
 
     # joint states
@@ -200,8 +217,10 @@ if __name__ == '__main__':
         optimizer.zero_grad()
         total_loss.backward()
         optimizer.step()
-
-        cost = np.sqrt(total_loss.item()/120.0) * 1000
+        if Setup603:
+            cost = np.sqrt(total_loss.item()/120.0) * 1000
+        else:
+            cost = np.sqrt(total_loss.item()/60.0) * 1000
         print('Epoch [{}/{}], Loss: {:.8f}'.format(epoch + 1, num_epochs, cost))
 
         epoch_list.append(epoch)
