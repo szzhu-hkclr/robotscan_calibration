@@ -108,7 +108,12 @@ def solve_aT3_6p(Link3TEnds, marker_points, threshold):
     est_3Ta_t_iter = est_3Ta_ini[:3, 3:]
     est_6p_iter = est_6p_ini
 
-    for i in range(10000):
+    cnt = 1
+    if Setup603:
+        cnt = 10000
+    else:
+        cnt = 50000
+    for i in range(cnt):
         est_3Ta_t_iter, est_6p_iter = solve_3Ta_t_6p(est_3Ta_R_iter, Link3TEnds_new, marker_points_new)
         est_3Ta_R_iter = solve_3Ta_R(est_3Ta_t_iter, est_6p_iter, Link3TEnds_new, marker_points_new)
 
@@ -204,7 +209,6 @@ def solve_3Ta_R(est_3Ta_t_iter, est_6p_iter, Link3TEnds, marker_points):
 
 
 if __name__ == "__main__":
-    # Setup603 = True
     Setup603 = False
 
     N_group = 0
@@ -226,30 +230,9 @@ if __name__ == "__main__":
         threshold = 0.00024
         trackerdata_folder = "./calib_aT3_data/data_ndi"
         robotdata_folder = "./calib_aT3_data/data_nachi"
-        group_lists = ["group1", "group2", "group3"]
+        group_lists = ["group1", "group2", "group3", "group4", "group5", "group6"]
        
-        
-        # dh_params = np.array([
-        #     [0.2495, 0.0, 0.0, 0.0],         # Joint 1
-        #     [0.0, 0.17, -np.pi/2, 0.0],      # Joint 2
-        #     [0.0, 0.157, np.pi/2, 0.0],      # Joint 3
-        #     [0.19, 0.81, 0.0, 0.0],          # Joint 4
-        #     [0.0, 0.0, -np.pi/2, 0.0],       # Joint 5
-        #     [0.0, 0.101, 0.0, 0.0]           # Joint 6
-        # ])
-
-        # generated from openrave:
-          # |  d        |  a  |  alpha  |  theta  |
-        # dh_params = np.array([
-        #     [0.2495,    0.0,    0.0,     0.],          
-        #     [0.3005,    0.17,   np.pi / 2,  0.],     
-        #     [0.,        0.88,   0.,      np.pi / 2],    
-        #     [0.,        0.19,   np.pi / 2,  0.],              
-        #     [0.81,      0.0,   -np.pi / 2,  0.],       
-        #     [0.0,       0.0,    np.pi / 2,  0.]               
-        # ])
-
-        # by yz:
+        # nachi mz25 by yz:
         #   |  d     |  a      | alpha  | theta|
         dh_params = np.array([
             [0.55,    0.17,     np.pi / 2,      0.],          

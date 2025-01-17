@@ -101,12 +101,12 @@ if __name__ == '__main__':
     else:
         trackerdata_folder = "./calib_aT3_data/data_ndi"
         robotdata_folder = "./calib_aT3_data/data_nachi"
-        group_lists = ["group1", "group2", "group3"]
+        group_lists = ["group1", "group2", "group3", "group4", "group5", "group6"]
         # d  a  alpha  theta
         DH_link_4 = Variable(torch.tensor([0.810, 0., -0.5 * np.pi, 0.00], requires_grad=True).cuda())
         DH_link_5 = Variable(torch.tensor([0.0, 0., 0.5 * np.pi, 0.], requires_grad=True).cuda())
         DH_link_6 = Variable(torch.tensor([0.115, 0., 0., 0.], requires_grad=True).cuda())
-        num_sample_each = [20, 20, 20]
+        num_sample_each = [20, 20, 20, 20, 20, 20]
     
     group_num = len(group_lists)
 
@@ -146,7 +146,13 @@ if __name__ == '__main__':
             X = tracker_data['X  [mm]'].to_list()
             Y = tracker_data['Y  [mm]'].to_list()
             Z = tracker_data['Z  [mm]'].to_list()
-            marker_points.extend([[X_i, Y_i, Z_i] for X_i, Y_i, Z_i in zip(X, Y, Z)])
+
+            marker_point_group = Variable(torch.from_numpy(np.array(
+                [[X_i / 1000.0, Y_i / 1000.0, Z_i / 1000.0] for X_i, Y_i, Z_i in
+                zip(X[:num_sample_each[i]],
+                    Y[:num_sample_each[i]],
+                    Z[:num_sample_each[i]])])).cuda())
+            marker_points.append(marker_point_group.float())
         else:
             file_path = os.path.join(trackerdata_folder, group + ".txt")
             with open(file_path, "r") as f:
@@ -217,10 +223,8 @@ if __name__ == '__main__':
         optimizer.zero_grad()
         total_loss.backward()
         optimizer.step()
-        if Setup603:
-            cost = np.sqrt(total_loss.item()/120.0) * 1000
-        else:
-            cost = np.sqrt(total_loss.item()/60.0) * 1000
+        # 120 items = 20 samples *6 grps
+        cost = np.sqrt(total_loss.item()/120.0) * 1000
         print('Epoch [{}/{}], Loss: {:.8f}'.format(epoch + 1, num_epochs, cost))
 
         epoch_list.append(epoch)
