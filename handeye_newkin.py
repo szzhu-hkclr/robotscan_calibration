@@ -136,6 +136,7 @@ def read_joints(file):
     return endposes
 
 Setup603 = False
+SetupMechEye = False
 num_group = 0
 group_lists = []
 
@@ -146,7 +147,10 @@ if Setup603:
     pose_folder = "./handeye_data/data_robot"
     group_lists = ["group1", "group2", "group3", "group4", "group5", "group6"]
 else:
-    image_folder = "./handeye_data/data_photoneo"
+    if SetupMechEye:
+        image_folder = "./handeye_data/data_mecheye"
+    else:
+        image_folder = "./handeye_data/data_photoneo"
     pose_folder = "./handeye_data/data_nachi"
     group_lists = ["group1", "group2", "group3", "group4", "group5", "group6"]
 
@@ -253,4 +257,10 @@ print("end_T_cam: ", end_T_cam)
 # end_T_cam:  [[-3.30782133e-04  9.99963029e-01 -8.59247147e-03 -3.61813900e-02]
 #  [-9.65561487e-01  1.91616571e-03  2.60167912e-01 -1.12514682e-01]
 #  [ 2.60174758e-01  8.38261843e-03  9.65525156e-01  1.20075923e-01]
+#  [ 0.00000000e+00  0.00000000e+00  0.00000000e+00  1.00000000e+00]]
+
+# 2025-02-05 mecheye
+# end_T_cam:  [[ 6.52032141e-03  9.99931118e-01  9.75935357e-03  7.34302525e-02]
+#  [-9.99978640e-01  6.52442644e-03 -3.88847118e-04 -4.19321620e-02]
+#  [-4.52494518e-04 -9.75660970e-03  9.99952301e-01  7.64250999e-02]
 #  [ 0.00000000e+00  0.00000000e+00  0.00000000e+00  1.00000000e+00]]

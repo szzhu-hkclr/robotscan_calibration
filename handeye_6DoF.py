@@ -149,6 +149,7 @@ def read_joints(file):
     return endposes
 
 Setup603 = False
+SetupMechEye = False
 group_lists = []
 
 if Setup603:
@@ -157,7 +158,10 @@ if Setup603:
     group_lists = ["group1", "group2", "group3", "group4", "group5", "group6"]
     square_size = 10 / 1000
 else:
-    image_folder = "./handeye_data/data_photoneo"
+    if SetupMechEye:
+        image_folder = "./handeye_data/data_mecheye"
+    else:
+        image_folder = "./handeye_data/data_photoneo"
     pose_folder = "./handeye_data/data_nachi"
     group_lists = ["group1", "group2", "group3", "group4", "group5", "group6"]
     square_size = 15 / 1000
@@ -273,3 +277,13 @@ print("Distortion: ", dist)
 #  [0.00000000e+00 0.00000000e+00 1.00000000e+00]]
 # Distortion:  [[-1.54898718e-01  3.31404747e-01  1.84773680e-04 -2.48342547e-04
 #   -5.43549319e-01]]
+
+# 2025-02-05 mecheye
+# end_T_cam:  [[ 7.20276905e-03  9.99924888e-01  9.91653398e-03  7.35596350e-02]
+#  [-9.99974002e-01  7.20579631e-03 -2.69578462e-04 -4.19921961e-02]
+#  [-3.41014738e-04 -9.91433445e-03  9.99950794e-01  7.58481561e-02]
+#  [ 0.00000000e+00  0.00000000e+00  0.00000000e+00  1.00000000e+00]]
+# Intrinsics:  [[2.28057878e+03 0.00000000e+00 1.40806928e+03]
+#  [0.00000000e+00 2.28009032e+03 8.93363155e+02]
+#  [0.00000000e+00 0.00000000e+00 1.00000000e+00]]
+# Distortion:  [[-0.00242916  0.02332046 -0.00018823  0.00046113 -0.0762033 ]]
