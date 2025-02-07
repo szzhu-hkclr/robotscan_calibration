@@ -8,8 +8,8 @@
       [0.115002386, -0.0000284695379, -0.0000907932772, -0.0000180119005]
     ],
     "num_group": 6,
-    "image_folder": "../handeye_data/data_photoneo",
-    "pose_folder": "../handeye_data/data_nachi",
+    "image_folder": "../../handeye_data/data_photoneo",
+    "pose_folder": "../../handeye_data/data_nachi",
     "square_size": 0.015,
     "pattern_size": [11, 8],
     "group_lists": ["group1", "group2", "group3", "group4", "group5", "group6"],
