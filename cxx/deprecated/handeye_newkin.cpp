@@ -13,7 +13,7 @@
 #include <opencv2/calib3d.hpp>
 
 // Include the nlohmann JSON header (download from https://github.com/nlohmann/json)
-#include "json.hpp"
+#include "../include/json.hpp"
 
 // Use the JSON namespace for convenience
 using json = nlohmann::json;

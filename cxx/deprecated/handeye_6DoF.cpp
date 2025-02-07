@@ -8,7 +8,7 @@
 #include <dirent.h>
 #include <opencv2/opencv.hpp>
 #include <opencv2/calib3d.hpp>
-#include <nlohmann/json.hpp>
+#include "../include/json.hpp"
 
 // For convenience
 using json = nlohmann::json;

@@ -15,7 +15,7 @@
 #include <opencv2/imgcodecs.hpp>
 
 // Include nlohmann/json library (download json.hpp from https://github.com/nlohmann/json)
-#include "json.hpp"
+#include "../include/json.hpp"
 
 using json = nlohmann::json;
 using namespace cv;
