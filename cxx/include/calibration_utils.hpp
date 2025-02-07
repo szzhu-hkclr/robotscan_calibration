@@ -1,6 +1,7 @@
 #pragma once
 #include <opencv2/opencv.hpp>
 #include <vector>
+#include <string>
 
 struct CalibrationResult {
     cv::Mat camera_matrix;
