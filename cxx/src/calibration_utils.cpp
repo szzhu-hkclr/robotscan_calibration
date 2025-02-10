@@ -50,3 +50,35 @@ std::vector<std::vector<double>> read_joint_angles(const std::string& file_path)
     }
     return angles_list;
 }
+
+void compute_camera_extrinsics(const std::vector<std::vector<cv::Point3f>>& object_points,
+                               const std::vector<std::vector<cv::Point2f>>& image_points,
+                               const cv::Mat& camera_matrix,
+                               const cv::Mat& dist_coeffs,
+                               std::vector<cv::Mat>& R_target2cam,
+                               std::vector<cv::Mat>& T_target2cam) {
+    for (size_t i = 0; i < image_points.size(); ++i) {
+        cv::Mat rvec, tvec;
+        cv::solvePnP(object_points[i], image_points[i], camera_matrix, dist_coeffs, rvec, tvec);
+        cv::Mat R;
+        cv::Rodrigues(rvec, R);
+        R_target2cam.push_back(R);
+        T_target2cam.push_back(tvec);
+    }
+}
+
+std::vector<cv::Mat> load_tracker_poses(const std::string& tracker_pose_file) {
+    std::vector<cv::Mat> tracker_poses;
+    cnpy::NpyArray arr = cnpy::npy_load(tracker_pose_file);
+    double* data = arr.data<double>();
+    for (size_t i = 0; i < arr.shape[0]; ++i) {
+        cv::Mat pose = cv::Mat::eye(4, 4, CV_64F);
+        for (int r = 0; r < 4; ++r) {
+            for (int c = 0; c < 4; ++c) {
+                pose.at<double>(r, c) = data[i * 16 + r * 4 + c];
+            }
+        }
+        tracker_poses.push_back(pose);
+    }
+    return tracker_poses;
+}
