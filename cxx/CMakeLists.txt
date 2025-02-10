@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.5)
-project(hand_eye_calibration)
+project(roboscan_calib)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -15,6 +15,7 @@ include_directories(
 )
 
 add_executable(${PROJECT_NAME}
+    src/roboscan_calib.cpp
     src/handeye_6DoF.cpp
     src/RobotSerial.cpp
     src/calibration_utils.cpp

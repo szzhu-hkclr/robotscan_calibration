@@ -17,6 +17,9 @@ Config load_config(const std::string& config_path) {
         });
     }
     config.group_lists = j["group_lists"].get<std::vector<std::string>>();
+    config.tracker_pose_file = j["tracker_pose_file"];
+    config.show_corners = j["show_corners"];
+    config.show_projection_error = j["show_projection_error"];
     
     return config;
 }
