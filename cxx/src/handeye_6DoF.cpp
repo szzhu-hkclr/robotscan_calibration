@@ -50,8 +50,8 @@ int run6DoFHandEyeCalibration(const Config &config) {
                 continue;
             }
 
-            // Compute forward kinematics.
-            cv::Mat T = robot.forward(joints_records[idx]);
+            // Compute EE forward kinematics.
+            cv::Mat T = robot.forward(joints_records[idx]).back();
             cv::Mat R = T(cv::Rect(0, 0, 3, 3)).clone();
             cv::Mat t = T(cv::Rect(3, 0, 1, 3)).clone();
 
@@ -70,6 +70,9 @@ int run6DoFHandEyeCalibration(const Config &config) {
 
     // Calibrate the camera intrinsics.
     CalibrationResult calib_result = calibrate_camera(all_object_points, all_image_points, image_size);
+    if (config.show_projection_error) {
+        std::cout << "Reprojection error: " << calib_result.reprojection_error << std::endl;
+    }
 
     // Convert rotation vectors to rotation matrices.
     std::vector<cv::Mat> RTarget2Cam, TTarget2Cam;
@@ -90,7 +93,7 @@ int run6DoFHandEyeCalibration(const Config &config) {
     R_cam2gripper.copyTo(end_T_cam(cv::Rect(0, 0, 3, 3)));
     t_cam2gripper.copyTo(end_T_cam(cv::Rect(3, 0, 1, 3)));
 
-    std::cout << "end_T_cam:\n" << end_T_cam << std::endl;
+    std::cout << "Hand-eye calibration result (end_T_cam):\n" << end_T_cam << std::endl;
     std::cout << "Camera Intrinsics:\n" << calib_result.camera_matrix << std::endl;
     std::cout << "Distortion Coefficients:\n" << calib_result.dist_coeffs << std::endl;
 

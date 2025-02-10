@@ -19,7 +19,7 @@ cv::Mat RobotSerial::compute_dh_transform(const DHParams& dh, double joint_angle
         0.0,        0.0,                    0.0,                   1.0);
 }
 
-cv::Mat RobotSerial::forward(const std::vector<double>& joint_angles) {
+std::vector<cv::Mat> RobotSerial::forward(const std::vector<double>& joint_angles) {
     // Check that joint_angles has the same number of elements as dh parameters.
     if (joint_angles.size() != dh_params_.size()) {
         std::cout << "joint_angles size:\n" << joint_angles.size() << std::endl;
@@ -27,12 +27,13 @@ cv::Mat RobotSerial::forward(const std::vector<double>& joint_angles) {
         throw std::runtime_error("Mismatch between number of joint angles and DH parameter rows.");
     }
     
+    std::vector<cv::Mat> Ts;
     cv::Mat T = cv::Mat::eye(4, 4, CV_64F);
     for (size_t i = 0; i < dh_params_.size(); ++i) {
         cv::Mat Ti = compute_dh_transform(dh_params_[i], joint_angles[i]);
         T = T * Ti;
+        Ts.push_back(T.clone());
     }
 
-
-    return T;
+    return Ts;
 }

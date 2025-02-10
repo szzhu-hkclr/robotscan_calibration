@@ -13,7 +13,7 @@ struct DHParams {
 class RobotSerial {
 public:
     RobotSerial(const std::vector<DHParams>& dh_params);
-    cv::Mat forward(const std::vector<double>& joint_angles);
+    std::vector<cv::Mat> forward(const std::vector<double>& joint_angles);
     
 private:
     cv::Mat compute_dh_transform(const DHParams& dh, double joint_angle) const;
