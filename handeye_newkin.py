@@ -136,7 +136,7 @@ def read_joints(file):
     return endposes
 
 Setup603 = False
-SetupMechEye = False
+SetupMechEye = True
 num_group = 0
 group_lists = []
 

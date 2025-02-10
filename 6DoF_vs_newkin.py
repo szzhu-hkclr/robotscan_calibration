@@ -149,7 +149,7 @@ def compute_transformation_diff(R_est, t_est, R_gt, t_gt):
 
 if __name__ == '__main__':
     Setup603 = False
-    SetupMechEye = False
+    SetupMechEye = True
     if Setup603:
         square_size = 10.0 / 1000.0
         pattern_size = (11, 8)
