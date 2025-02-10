@@ -6,9 +6,12 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 find_package(OpenCV REQUIRED)
 
+add_subdirectory(cnpy)
+
 include_directories(
     include
     ${OpenCV_INCLUDE_DIRS}
+    ${CMAKE_CURRENT_SOURCE_DIR}/cnpy
 )
 
 add_executable(${PROJECT_NAME}
@@ -21,6 +24,5 @@ add_executable(${PROJECT_NAME}
 
 target_link_libraries(${PROJECT_NAME}
     ${OpenCV_LIBS}
+    cnpy
 )
-
-install(TARGETS ${PROJECT_NAME} DESTINATION bin)
