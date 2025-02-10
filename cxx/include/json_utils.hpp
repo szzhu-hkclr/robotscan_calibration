@@ -1,5 +1,6 @@
 #pragma once
 #include "json.hpp"
+#include "RobotSerial.hpp"
 #include <string>
 #include <vector>
 
@@ -8,8 +9,12 @@ struct Config {
     std::string pose_folder;
     float square_size;
     std::vector<int> pattern_size;
-    std::vector<std::vector<double>> dh_params;
+    std::vector<DHParams> dh_params;
     std::vector<std::string> group_lists;
+    std::string tracker_pose_file;
+    
+    bool show_corners;
+    bool show_projection_error;
 };
 
 Config load_config(const std::string& config_path);

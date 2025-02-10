@@ -11,5 +11,8 @@
     [0.00022009054, 0.00016752045, 1.5704931, 0.00029131345],
     [0.115002386, -0.0000284695379, -0.0000907932772, -0.0000180119005]
   ],
-  "group_lists": ["group1", "group2", "group3", "group4", "group5", "group6"]
+  "group_lists": ["group1", "group2", "group3", "group4", "group5", "group6"],
+  "tracker_pose_file": "../../aT3s_opt.npy",
+  "show_corners": false,
+  "show_projection_error": true
 }
