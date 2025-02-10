@@ -1,4 +1,5 @@
 #include "handeye_6DoF.hpp"
+#include "handeye_newkin.hpp"
 
 int main(int argc, char **argv) {
     if (argc < 3) {
@@ -16,9 +17,9 @@ int main(int argc, char **argv) {
         if (command == "6dof") {
             return run6DoFHandEyeCalibration(config);
         }
-        // else if (command == "other") {
-        //     return runAnotherApplication(config);
-        // }
+        else if (command == "new") {
+            return runNewKinHandEyeCalibration(config);
+        }
         else {
             std::cerr << "Unknown command: " << command << std::endl;
             std::cerr << "Available commands: hand_eye, other" << std::endl;
