@@ -51,7 +51,7 @@ int run6DoFHandEyeCalibration(const Config &config) {
             }
 
             // Compute EE forward kinematics.
-            cv::Mat T = robot.forward(joints_records[idx]).back();
+            cv::Mat T = robot.forward(joints_records[idx]);
             cv::Mat R = T(cv::Rect(0, 0, 3, 3)).clone();
             cv::Mat t = T(cv::Rect(3, 0, 1, 3)).clone();
 

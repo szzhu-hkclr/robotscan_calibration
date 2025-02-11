@@ -4,7 +4,8 @@
 RobotSerial::RobotSerial(const std::vector<DHParams>& dh_params) : dh_params_(dh_params) {}
 
 cv::Mat RobotSerial::compute_dh_transform(const DHParams& dh, double joint_angle) const {
-    // Assuming the provided joint angle is in radians.
+    // Compute the transformation using standard DH parameters.
+    // The effective theta is the sum of the fixed offset and the provided joint angle.
     double theta = dh.theta + joint_angle;
    
     double cos_theta = cos(theta);
@@ -19,21 +20,35 @@ cv::Mat RobotSerial::compute_dh_transform(const DHParams& dh, double joint_angle
         0.0,        0.0,                    0.0,                   1.0);
 }
 
-std::vector<cv::Mat> RobotSerial::forward(const std::vector<double>& joint_angles) {
-    // Check that joint_angles has the same number of elements as dh parameters.
+cv::Mat RobotSerial::forward(const std::vector<double>& joint_angles) {
+    // Check that joint_angles has the same number of elements as DH parameters.
     if (joint_angles.size() != dh_params_.size()) {
-        std::cout << "joint_angles size:\n" << joint_angles.size() << std::endl;
-        std::cout << "dh_params size :\n" << dh_params_.size() << std::endl;
+        std::cout << "joint_angles size: " << joint_angles.size() << std::endl;
+        std::cout << "dh_params size: " << dh_params_.size() << std::endl;
         throw std::runtime_error("Mismatch between number of joint angles and DH parameter rows.");
     }
     
-    std::vector<cv::Mat> Ts;
-    cv::Mat T = cv::Mat::eye(4, 4, CV_64F);
+    // Compute the individual transformation matrices (non-cumulative) for each joint.
+    std::vector<cv::Mat> Ts_individual;
+    Ts_individual.reserve(dh_params_.size());
     for (size_t i = 0; i < dh_params_.size(); ++i) {
         cv::Mat Ti = compute_dh_transform(dh_params_[i], joint_angles[i]);
-        T = T * Ti;
-        Ts.push_back(T.clone());
+        Ts_individual.push_back(Ti);
     }
+    
+    // Cache the individual transforms 
+    ts_ = Ts_individual;
+    
+    // Compute the cumulative transformation (i.e., the end-effector frame)
+    cv::Mat T_cumulative = cv::Mat::eye(4, 4, CV_64F);
+    for (size_t i = 0; i < Ts_individual.size(); ++i) {
+        T_cumulative = T_cumulative * Ts_individual[i];
+    }
+    
+    return T_cumulative;
+}
 
-    return Ts;
+std::vector<cv::Mat> RobotSerial::get_ts() const {
+    // Returns the cached individual transformation matrices (non-cumulative) computed in forward().
+    return ts_;
 }
