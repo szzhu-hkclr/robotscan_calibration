@@ -170,7 +170,11 @@ ShowProjectError = True
 ShowCorners = False
 
 # tracker_T_3 poses
+print(f"Pose file path:", posefile_path)
 tracker_T_3s = np.load(posefile_path)
+print(f"Tracker Pose:")
+for each in enumerate(tracker_T_3s):
+    print(each)
 
 # camera calibration
 chessboard_corners, IndexWithImg = find_chessboard_corners(images, pattern_size, ShowCorners=ShowCorners)
@@ -216,6 +220,10 @@ for group, i in zip(group_lists, range(num_group)):
     for pose in pose_group:
         f = robot.forward(np.array(pose))
         Ts = robot.ts
+
+        # for i, frame in enumerate(Ts):
+        #     print(f"Frame {i}:")
+        #     print(Ts[i].t_4_4)
         Link3TEnd_i = np.eye(4)
         for j in range(3, 6):
             Link3TEnd_i = Link3TEnd_i.dot(Ts[j].t_4_4)
@@ -227,6 +235,11 @@ for group, i in zip(group_lists, range(num_group)):
 
 REnd2Base = np.array(REnd2Base)
 TEnd2Base = np.array(TEnd2Base)
+
+# print("REnd2Base: ", REnd2Base)
+# print("TEnd2Base: ", TEnd2Base)
+# print("RTarget2Cam: ", RTarget2Cam)
+# print("TTarget2Cam: ", TTarget2Cam)
 
 R_cam2gripper, t_cam2gripper = cv2.calibrateHandEye(
     REnd2Base,

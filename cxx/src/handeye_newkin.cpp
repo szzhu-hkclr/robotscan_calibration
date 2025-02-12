@@ -37,7 +37,12 @@ int runNewKinHandEyeCalibration(const Config &config) {
                               R_target2cam, T_target2cam);
     
     // Load tracker poses using the helper function in calibration_utils.cpp.
+    std::cout << config.tracker_pose_file << std::endl;
     std::vector<cv::Mat> tracker_T_3s = load_tracker_poses(config.tracker_pose_file);
+    std::cout << "Tracker poses (tracker_T_3s):" << std::endl;
+    for (size_t i = 0; i < tracker_T_3s.size(); ++i) {
+        std::cout << tracker_T_3s[i] << std::endl;
+    }
     
     // Compute robot poses using the RobotSerial class.
     RobotSerial robot(config.dh_params);
@@ -52,15 +57,43 @@ int runNewKinHandEyeCalibration(const Config &config) {
             continue;
         }
         for (const auto &joint_angles : joints_records) {
-            auto Ts = robot.forward(joint_angles);
+            cv::Mat end_frame = robot.forward(joint_angles);
+            std::vector<cv::Mat> Ts = robot.get_ts();
+
+            // std::cout << "Transformation matrices (Ts):" << std::endl;
+            // for (size_t i = 0; i < Ts.size(); ++i) {
+            //     std::cout << "Frame " << i << ":" << std::endl;
+            //     std::cout << Ts[i] << std::endl;
+            // }
+
             cv::Mat T_3_end = cv::Mat::eye(4, 4, CV_64F);
             for (int j = 3; j < 6; ++j)
+            {
                 T_3_end = T_3_end * Ts[j];
+                // std::cout << "T_3_end:\n" << T_3_end << std::endl;
+            }
             cv::Mat T = tracker_T_3s[g] * T_3_end;
             R_end2base.push_back(T(cv::Rect(0, 0, 3, 3)).clone());
             T_end2base.push_back(T(cv::Rect(3, 0, 1, 3)).clone());
         }
     }
+
+    // std::cout << "R_end2base:\n" << std::endl;
+    // for (auto each : R_end2base) {
+    //     std::cout << each << std::endl;
+    // }
+    // std::cout << "T_end2base:\n" << std::endl;
+    // for (auto each : T_end2base) {
+    //     std::cout << each << std::endl;
+    // }
+    // std::cout << "R_target2cam:\n" << std::endl;
+    // for (auto each : R_target2cam) {
+    //     std::cout << each << std::endl;
+    // }
+    // std::cout << "T_target2cam:\n" << std::endl;
+    // for (auto each : T_target2cam) {
+    //     std::cout << each << std::endl;
+    // }
     
     // Perform hand–eye calibration using method 4.
     cv::Mat R_cam2gripper, T_cam2gripper;

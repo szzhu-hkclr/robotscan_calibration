@@ -70,15 +70,44 @@ void compute_camera_extrinsics(const std::vector<std::vector<cv::Point3f>>& obje
 std::vector<cv::Mat> load_tracker_poses(const std::string& tracker_pose_file) {
     std::vector<cv::Mat> tracker_poses;
     cnpy::NpyArray arr = cnpy::npy_load(tracker_pose_file);
-    double* data = arr.data<double>();
-    for (size_t i = 0; i < arr.shape[0]; ++i) {
-        cv::Mat pose = cv::Mat::eye(4, 4, CV_64F);
-        for (int r = 0; r < 4; ++r) {
-            for (int c = 0; c < 4; ++c) {
-                pose.at<double>(r, c) = data[i * 16 + r * 4 + c];
-            }
-        }
-        tracker_poses.push_back(pose);
+
+    // Check that the NpyArray has dimensions (N, 4, 4)
+    if (arr.shape.size() != 3 || arr.shape[1] != 4 || arr.shape[2] != 4) {
+        std::cerr << "Error: Expected a 3D array with dimensions (N, 4, 4)" << std::endl;
+        throw std::runtime_error("Invalid npy file shape");
     }
+
+    size_t num_matrices = arr.shape[0];
+    size_t elements_per_matrix = 16;  // 4x4
+
+    // Determine if data is stored as double or float using the word size
+    if (arr.word_size == sizeof(double)) {
+        double* data = arr.data<double>();
+        for (size_t i = 0; i < num_matrices; ++i) {
+            cv::Mat pose = cv::Mat::eye(4, 4, CV_64F);
+            for (int r = 0; r < 4; ++r) {
+                for (int c = 0; c < 4; ++c) {
+                    pose.at<double>(r, c) = data[i * elements_per_matrix + r * 4 + c];
+                }
+            }
+            tracker_poses.push_back(pose);
+        }
+    } else if (arr.word_size == sizeof(float)) {
+        float* data = arr.data<float>();
+        for (size_t i = 0; i < num_matrices; ++i) {
+            cv::Mat pose = cv::Mat::eye(4, 4, CV_64F);
+            for (int r = 0; r < 4; ++r) {
+                for (int c = 0; c < 4; ++c) {
+                    // Cast float to double when populating the cv::Mat for consistency
+                    pose.at<double>(r, c) = static_cast<double>(data[i * elements_per_matrix + r * 4 + c]);
+                }
+            }
+            tracker_poses.push_back(pose);
+        }
+    } else {
+        std::cerr << "Error: Unrecognized data type in npy file." << std::endl;
+        throw std::runtime_error("Unsupported npy data type");
+    }
+
     return tracker_poses;
 }
