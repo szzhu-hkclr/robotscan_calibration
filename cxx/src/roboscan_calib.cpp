@@ -1,5 +1,6 @@
 #include "handeye_6DoF.hpp"
 #include "handeye_newkin.hpp"
+#include "6DoF_vs_newkin.hpp"
 
 int main(int argc, char **argv) {
     if (argc < 3) {
@@ -19,6 +20,9 @@ int main(int argc, char **argv) {
         }
         else if (command == "new") {
             return runNewKinHandEyeCalibration(config);
+        }
+        else if (command == "err") {
+            return runevaluateHandEyeError(config);
         }
         else {
             std::cerr << "Unknown command: " << command << std::endl;

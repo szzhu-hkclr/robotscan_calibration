@@ -8,6 +8,7 @@ int runNewKinHandEyeCalibration(const Config &config) {
     // Load images from each group using read_images() provided in image_utils.cpp.
     std::vector<cv::Mat> images;
     for (const std::string &group : config.group_lists) {
+        std::cout << "image_folder: " << config.image_folder << std::endl;
         std::string group_folder = config.image_folder + "/" + group;
         std::vector<cv::Mat> group_images = read_images(group_folder);
         images.insert(images.end(), group_images.begin(), group_images.end());
@@ -45,7 +46,7 @@ int runNewKinHandEyeCalibration(const Config &config) {
     }
     
     // Compute robot poses using the RobotSerial class.
-    RobotSerial robot(config.dh_params);
+    RobotSerial robot(config.dh_params_new);
     std::vector<cv::Mat> R_end2base, T_end2base;
     
     // For each group, load joint angles file and compute forward kinematics.

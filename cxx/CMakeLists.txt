@@ -16,6 +16,7 @@ include_directories(
 
 add_executable(${PROJECT_NAME}
     src/roboscan_calib.cpp
+    src/6DoF_vs_newkin.cpp
     src/handeye_newkin.cpp
     src/handeye_6DoF.cpp
     src/RobotSerial.cpp

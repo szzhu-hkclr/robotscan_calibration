@@ -18,6 +18,7 @@ int run6DoFHandEyeCalibration(const Config &config) {
 
     // Process each group from the configuration.
     for (const auto &group : config.group_lists) {
+        std::cout << "image_folder: " << config.image_folder << std::endl;
         std::string image_group_folder = config.image_folder + "/" + group;
         auto images = read_images(image_group_folder);
         if (images.empty()) {
