@@ -111,3 +111,64 @@ std::vector<cv::Mat> load_tracker_poses(const std::string& tracker_pose_file) {
 
     return tracker_poses;
 }
+
+std::vector<cv::Mat> compute_camera_poses(
+    const std::vector<std::vector<cv::Point2f>>& chessboard_corners,
+    cv::Size pattern_size,
+    float square_size,
+    const cv::Mat& intrinsic_matrix,
+    const cv::Mat& dist,
+    bool Testing)
+{
+    std::vector<cv::Mat> cam_T_chesss; // This will hold the 4x4 transformation matrices.
+    
+    // Build the object points (points in real space) for the chessboard
+    std::vector<cv::Point3f> object_points;
+    for (int i = 0; i < pattern_size.height; ++i) {
+        for (int j = 0; j < pattern_size.width; ++j) {
+            object_points.push_back(cv::Point3f(j * square_size, i * square_size, 0.0f));
+        }
+    }
+    
+    int iteration = 1;
+    
+    // Loop over each set of chessboard corners.
+    for (const auto& corners : chessboard_corners)
+    {
+        cv::Mat rvec, tvec;
+        bool success = cv::solvePnP(object_points, corners, intrinsic_matrix, dist, rvec, tvec);
+        if (!success) {
+            std::cerr << "solvePnP failed for iteration " << iteration << std::endl;
+            iteration++;
+            continue;
+        }
+    
+        if (Testing) {
+            std::cout << "Current iteration: " << iteration 
+                      << " out of " << chessboard_corners.size() << " iterations." << std::endl;
+            std::cout << "rvec: " << rvec.t() << std::endl;
+            std::cout << "rvec[0]: " << rvec.at<double>(0) << std::endl;
+            std::cout << "rvec[1]: " << rvec.at<double>(1) << std::endl;
+            std::cout << "rvec[2]: " << rvec.at<double>(2) << std::endl;
+            std::cout << "--------------------" << std::endl;
+        }
+    
+        // Convert the rotation vector to a rotation matrix.
+        cv::Mat R;
+        cv::Rodrigues(rvec, R);
+    
+        // Build the 4x4 transformation matrix.
+        cv::Mat cam_T_chess = cv::Mat::eye(4, 4, R.type());
+        // Insert rotation matrix into the top-left 3x3 block.
+        R.copyTo(cam_T_chess(cv::Rect(0, 0, 3, 3)));
+        // Insert translation vector into the top-right 3x1 block.
+        cam_T_chess.at<double>(0, 3) = tvec.at<double>(0);
+        cam_T_chess.at<double>(1, 3) = tvec.at<double>(1);
+        cam_T_chess.at<double>(2, 3) = tvec.at<double>(2);
+    
+        cam_T_chesss.push_back(cam_T_chess);
+        iteration++;
+    }
+    
+    return cam_T_chesss;
+}

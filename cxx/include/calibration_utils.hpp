@@ -26,4 +26,12 @@ void compute_camera_extrinsics(const std::vector<std::vector<cv::Point3f>>& obje
                                std::vector<cv::Mat>& R_target2cam,
                                std::vector<cv::Mat>& T_target2cam);
 
-std::vector<cv::Mat> load_tracker_poses(const std::string &tracker_pose_file);                               
+std::vector<cv::Mat> load_tracker_poses(const std::string &tracker_pose_file);
+
+std::vector<cv::Mat> compute_camera_poses(
+    const std::vector<std::vector<cv::Point2f>> &chessboard_corners,
+    cv::Size pattern_size,
+    float square_size,
+    const cv::Mat &intrinsic_matrix,
+    const cv::Mat &dist,
+    bool Testing = false);                      
