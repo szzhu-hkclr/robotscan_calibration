@@ -66,5 +66,6 @@
         "forward_list": "cpp",
         "valarray": "cpp",
         "filesystem": "cpp"
-    }
+    },
+    "cmake.ignoreCMakeListsMissing": true
 }
