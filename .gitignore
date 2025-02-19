@@ -1,5 +1,5 @@
 # calib_aT3_data/old_*
 # handeye_data/old_*
-evaluate_data/603_data/image_data/*_textured.ply
+evaluate_data/16w_data/image_data/*_textured.ply
 evaluate_data/16w_data/image_data/*_textured_trans_*.ply
 cxx/build/*
