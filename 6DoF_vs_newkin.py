@@ -149,7 +149,9 @@ def compute_transformation_diff(R_est, t_est, R_gt, t_gt):
 
 if __name__ == '__main__':
     Setup603 = False
-    SetupMechEye = True
+    SetupMechEye = False
+    SetupPatternSize6 = True
+    
     if Setup603:
         square_size = 10.0 / 1000.0
         pattern_size = (11, 8)
@@ -160,7 +162,10 @@ if __name__ == '__main__':
                                     [0.00000000e+00, 0.00000000e+00, 1.00000000e+00]])
         dist = np.array([[-7.14967118e-03, -1.69424563e-03, -4.70604299e-05, -2.47795750e-04, 4.36516991e-02]])
     else:
-        square_size = 15.0 / 1000.0
+        if SetupPatternSize6:
+            square_size = 6 / 1000
+        else:
+            square_size = 15 / 1000
         pattern_size = (11, 8)
         image_folder = "./evaluate_data/16w_data/image_data"
         robotfile_path = os.path.join("./evaluate_data/16w_data/robot_data.txt")

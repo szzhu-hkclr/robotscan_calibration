@@ -136,7 +136,8 @@ def read_joints(file):
     return endposes
 
 Setup603 = False
-SetupMechEye = True
+SetupMechEye = False
+SetupPatternSize6 = True
 num_group = 0
 group_lists = []
 
@@ -165,7 +166,10 @@ pattern_size = (11, 8)
 if Setup603:
     square_size = 10 / 1000
 else:
-    square_size = 15 / 1000
+    if SetupPatternSize6:
+        square_size = 6 / 1000
+    else:
+        square_size = 15 / 1000
 ShowProjectError = True
 ShowCorners = False
 

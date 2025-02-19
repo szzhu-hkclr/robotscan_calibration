@@ -149,7 +149,8 @@ def read_joints(file):
     return endposes
 
 Setup603 = False
-SetupMechEye = True
+SetupMechEye = False
+SetupPatternSize6 = True
 group_lists = []
 
 if Setup603:
@@ -162,9 +163,13 @@ else:
         image_folder = "./handeye_data/data_mecheye"
     else:
         image_folder = "./handeye_data/data_photoneo"
+    if SetupPatternSize6:
+        square_size = 6 / 1000
+    else:
+        square_size = 15 / 1000
+
     pose_folder = "./handeye_data/data_nachi"
     group_lists = ["group1", "group2", "group3", "group4", "group5", "group6"]
-    square_size = 15 / 1000
 
 pattern_size = (11, 8)
 
