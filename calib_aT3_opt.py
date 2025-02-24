@@ -208,7 +208,7 @@ if __name__ == '__main__':
     optimizer = torch.optim.Adam([DH_link_4, DH_link_5, DH_link_6, marker_p, pose_all_groups], lr=1e-4)
     lossfun = nn.MSELoss(reduction='sum')
 
-    num_epochs = 15000
+    num_epochs = 10000
     epoch_list = []
     cost_list = []
     for epoch in range(num_epochs):
