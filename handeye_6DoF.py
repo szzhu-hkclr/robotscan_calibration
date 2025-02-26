@@ -219,19 +219,29 @@ else:
     ])
 robot = RobotSerial(dh_params)
 
+img_counter = 0
+valid_img_counter = 0
 for group in group_lists:
     pose_file = f'{pose_folder}/{group}.txt'
     pose_group = read_joints(pose_file)
 
     for pose in pose_group:
-        f = robot.forward(np.array(pose))
-        T = robot.end_frame.t_4_4
-        REnd2Base.append(T[:3, :3])
-        TEnd2Base.append(T[:3, 3])
-
+        # Check if this image had a successful chessboard detection
+        if img_counter in IndexWithImg:
+            f = robot.forward(np.array(pose))
+            T = robot.end_frame.t_4_4
+            REnd2Base.append(T[:3, :3])
+            TEnd2Base.append(T[:3, 3])
+            valid_img_counter += 1
+        img_counter += 1
 
 REnd2Base = np.array(REnd2Base)
 TEnd2Base = np.array(TEnd2Base)
+
+# Now the sizes should match
+print(f"Applied images: {valid_img_counter}/{img_counter}")
+print(f"Number of valid robot poses: {len(REnd2Base)}")
+print(f"Number of valid camera poses: {len(RTarget2Cam)}")
 
 
 
