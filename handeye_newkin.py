@@ -153,7 +153,10 @@ else:
     else:
         image_folder = "./handeye_data/data_photoneo"
     pose_folder = "./handeye_data/data_nachi"
-    group_lists = ["group1", "group2", "group3", "group4", "group5", "group6"]
+    if SetupPatternSize6:
+        group_lists = [ "group3", "group4"]
+    else:
+        group_lists = ["group1", "group2", "group3", "group4", "group5", "group6"]
 
 num_group = len(group_lists)
 images = []
@@ -191,6 +194,12 @@ intrinsic_matrix, dist = calculate_intrinsics(chessboard_corners, IndexWithImg,
 # Calculate camera extrinsics
 RTarget2Cam, TTarget2Cam = compute_camera_poses(chessboard_corners, pattern_size, square_size, intrinsic_matrix, dist)
 
+# Create a list to track which tracker pose to use for each group
+tracker_pose_indices = []
+for i in range(len(group_lists)):
+    # uses the last available tracker pose for any group index that would exceed the bounds.
+    tracker_pose_index = min(i, len(tracker_T_3s) - 1)
+    tracker_pose_indices.append(tracker_pose_index)
 
 REnd2Base = []
 TEnd2Base = []
@@ -217,22 +226,23 @@ else:
     ])
 robot = RobotSerial(dh_params)
 
-for group, i in zip(group_lists, range(num_group)):
+for group_idx, group in enumerate(group_lists):
     pose_file = f'{pose_folder}/{group}.txt'
     pose_group = read_joints(pose_file)
+    
+    # Use the mapped tracker pose index
+    tracker_pose_index = tracker_pose_indices[group_idx]
 
     for pose in pose_group:
         f = robot.forward(np.array(pose))
         Ts = robot.ts
 
-        # for i, frame in enumerate(Ts):
-        #     print(f"Frame {i}:")
-        #     print(Ts[i].t_4_4)
         Link3TEnd_i = np.eye(4)
         for j in range(3, 6):
             Link3TEnd_i = Link3TEnd_i.dot(Ts[j].t_4_4)
 
-        T = tracker_T_3s[i].dot(Link3TEnd_i)
+        # Use the mapped tracker pose index instead of group_idx
+        T = tracker_T_3s[tracker_pose_index].dot(Link3TEnd_i)
         REnd2Base.append(T[:3, :3])
         TEnd2Base.append(T[:3, 3])
 
