@@ -176,6 +176,8 @@ else:
 ShowProjectError = True
 ShowCorners = False
 
+print(f"Group list:", group_lists)
+
 # tracker_T_3 poses
 print(f"Pose file path:", posefile_path)
 tracker_T_3s = np.load(posefile_path)
@@ -291,3 +293,9 @@ print("end_T_cam: ", end_T_cam)
 #  [-9.99978640e-01  6.52442644e-03 -3.88847118e-04 -4.19321620e-02]
 #  [-4.52494518e-04 -9.75660970e-03  9.99952301e-01  7.64250999e-02]
 #  [ 0.00000000e+00  0.00000000e+00  0.00000000e+00  1.00000000e+00]]
+
+# 2025-02-24 photoneo
+# end_T_cam:  [[-0.00280774 -0.99993985  0.01060246  0.03759239]
+#  [ 0.96403859 -0.00552423 -0.26570487  0.11280878]
+#  [ 0.26574746  0.00947515  0.96399612  0.12180479]
+#  [ 0.          0.          0.          1.        ]]
