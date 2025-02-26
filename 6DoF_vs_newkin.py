@@ -356,6 +356,11 @@ if __name__ == '__main__':
     # tracker_T_3 poses
     posefile_path = "./aT3s_opt.npy"
     tracker_T_3s = np.load(posefile_path)
+    
+    # Print the shape of tracker_T_3s for debugging
+    print(f"Loaded tracker_T_3s with shape: {tracker_T_3s.shape}")
+    print(f"Number of robot states: {len(robot_states)}")
+    
     if Setup603:
         end_T_cam = np.array([[0.99999378, 0.00218076, -0.00277091, 0.04262605],
                             [-0.00216497, 0.99998148, 0.00568824, 0.0067556],
@@ -386,18 +391,19 @@ if __name__ == '__main__':
                                           [ 2.60174758e-01,  8.38261843e-03,  9.65525156e-01,  1.20075923e-01],
                                           [ 0.00000000e+00,  0.00000000e+00,  0.00000000e+00,  1.00000000e+00]])
 
+    # Instead of using a fallback for missing tracker data,
+    # we filter to process only robot states that have tracker data available.
     tracker_T_camidxs = []
-    for idx in range(len(robot_states)):
+    valid_indices = min(len(robot_states), len(tracker_T_3s))
+    for idx in range(valid_indices):
         robot_state = robot_states[idx]
         f = robot_new.forward(np.array(robot_state))
-
         Ts = robot_new.ts
         Link3TEnd_i = np.eye(4)
         for j in range(3, 6):
             Link3TEnd_i = Link3TEnd_i.dot(Ts[j].t_4_4)
-
-        tracker_T_camidx = tracker_T_3s[idx].dot(Link3TEnd_i).dot(end_T_cam)
-
+        current_tracker_T_3 = tracker_T_3s[idx]
+        tracker_T_camidx = current_tracker_T_3.dot(Link3TEnd_i).dot(end_T_cam)
         tracker_T_camidxs.append(tracker_T_camidx)
 
     tracker_T_cam1 = tracker_T_camidxs[0]
@@ -428,39 +434,52 @@ if __name__ == '__main__':
         K6DoF_cam1_T_cami = K6DoF_cam1_T_camidxs[i]
         K3DoF_cam1_T_cami = K3DoF_cam1_T_camidxs[i]
 
-        error_R_K6DoF, error_t_K6DoF = compute_transformation_diff(K6DoF_cam1_T_cami[:3, :3], K6DoF_cam1_T_cami[:3, 3:], cam_cam1_T_cami[:3, :3], cam_cam1_T_cami[:3, 3:])
-        error_R_K3DoF, error_t_K3DoF = compute_transformation_diff(K3DoF_cam1_T_cami[:3, :3], K3DoF_cam1_T_cami[:3, 3:], cam_cam1_T_cami[:3, :3], cam_cam1_T_cami[:3, 3:])
+        error_R_K6DoF, error_t_K6DoF = compute_transformation_diff(
+            K6DoF_cam1_T_cami[:3, :3], K6DoF_cam1_T_cami[:3, 3:], 
+            cam_cam1_T_cami[:3, :3], cam_cam1_T_cami[:3, 3:]
+        )
+        error_R_K3DoF, error_t_K3DoF = compute_transformation_diff(
+            K3DoF_cam1_T_cami[:3, :3], K3DoF_cam1_T_cami[:3, 3:], 
+            cam_cam1_T_cami[:3, :3], cam_cam1_T_cami[:3, 3:]
+        )
 
         errors_R_K6DoF.append(error_R_K6DoF)
         errors_t_K6DoF.append(error_t_K6DoF * 1000)
         errors_R_K3DoF.append(error_R_K3DoF)
         errors_t_K3DoF.append(error_t_K3DoF * 1000)
 
-    plt.subplot(2, 1, 1)
+    fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(10, 8))
 
-    plt.plot(range(len(errors_R_K6DoF)), errors_R_K6DoF, label="6DOF_R_error")
-    plt.plot(range(len(errors_R_K3DoF)), errors_R_K3DoF, label="Ours_R_error")
-    plt.title("Rotation Error")
-    plt.ylim(0, 0.2)
+    # First subplot - Rotation Error
+    ax1.plot(range(len(errors_R_K6DoF)), errors_R_K6DoF, label="6DOF_R_error")
+    ax1.plot(range(len(errors_R_K3DoF)), errors_R_K3DoF, label="Ours_R_error")
+    ax1.set_title("Rotation Error")
+    ax1.set_ylim(0, 40)  # Adjusted based on your error values
+    ax1.set_xlabel('Index')
+    ax1.set_ylabel('Error (deg.)')
+    ax1.legend()
 
-    plt.xlabel('Index')
-    plt.ylabel('Error (deg.)')
-    plt.legend()
+    # Second subplot - Translation Error
+    ax2.plot(range(len(errors_t_K6DoF)), errors_t_K6DoF, label="6DOF_t_error")
+    ax2.plot(range(len(errors_t_K3DoF)), errors_t_K3DoF, label="Ours_t_error")
+    ax2.set_title("Translation Error")
+    ax2.set_ylim(0, 1000)  # Adjusted based on your error values
+    ax2.set_xlabel('Index')
+    ax2.set_ylabel('Error (mm)')
+    ax2.legend()
 
-    plt.subplot(2, 1, 2)
+    plt.tight_layout()  # Adjusts subplot params for better spacing
+    plt.subplots_adjust(hspace=0.4)  # Add space between subplots
 
-    plt.plot(range(len(errors_t_K6DoF)), errors_t_K6DoF, label="6DOF_t_error")
-    plt.plot(range(len(errors_t_K3DoF)), errors_t_K3DoF, label="Ours_t_error")
-    plt.title("Translation Error")
-    plt.ylim(0, 3)
+    # Save the figure to a file since the backend doesn't support display
+    plt.savefig('error_comparison_plot.png', dpi=300)
 
-    plt.xlabel('Index')
-    plt.ylabel('Error (mm)')
-
-    plt.subplots_adjust(hspace=0.6)
-
-    plt.legend()
-    plt.show()
+    # You can optionally still try to show it
+    try:
+        plt.show()
+    except Exception as e:
+        print(f"Could not display plot: {e}")
+        print("Plot has been saved to 'error_comparison_plot.png'")
 
 
     print("errors_R_K6DoF", errors_R_K6DoF)
