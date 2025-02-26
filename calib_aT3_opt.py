@@ -82,6 +82,7 @@ def kinematic_forward_eachgroup(pose_group_i, DH_link_4, DH_link_5, DH_link_6, m
 
 if __name__ == '__main__':
     Setup603 = False
+    SetupPatternSize6 = True
 
     torch.set_printoptions(precision=10)
     init_6p_file = "p_init.npy"
@@ -101,7 +102,10 @@ if __name__ == '__main__':
     else:
         trackerdata_folder = "./calib_aT3_data/data_ndi"
         robotdata_folder = "./calib_aT3_data/data_nachi"
-        group_lists = ["group1", "group2", "group3", "group4", "group5", "group6"]
+        if SetupPatternSize6:
+            group_lists = [ "group3", "group4"]
+        else:
+            group_lists = ["group1", "group2", "group3", "group4", "group5", "group6"]
         # d  a  alpha  theta
         DH_link_4 = Variable(torch.tensor([0.810, 0., -0.5 * np.pi, 0.00], requires_grad=True).cuda())
         DH_link_5 = Variable(torch.tensor([0.0, 0., 0.5 * np.pi, 0.], requires_grad=True).cuda())
@@ -208,7 +212,7 @@ if __name__ == '__main__':
     optimizer = torch.optim.Adam([DH_link_4, DH_link_5, DH_link_6, marker_p, pose_all_groups], lr=1e-4)
     lossfun = nn.MSELoss(reduction='sum')
 
-    num_epochs = 30000
+    num_epochs = 500
     epoch_list = []
     cost_list = []
     for epoch in range(num_epochs):
