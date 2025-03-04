@@ -210,7 +210,7 @@ def solve_3Ta_R(est_3Ta_t_iter, est_6p_iter, Link3TEnds, marker_points):
 
 if __name__ == "__main__":
     Setup603 = False
-    SetupPatternSize6 = True
+    SetupPatternSize6 = False
 
     N_group = 0
     group_lists = []
