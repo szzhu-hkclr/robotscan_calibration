@@ -7,6 +7,7 @@ import os
 from scipy.spatial.transform import Rotation as R
 import pandas as pd
 import math
+from math import pi
 
 from visual_kinematics.RobotSerial import *
 
@@ -41,10 +42,9 @@ def find_chessboard_corners(images, pattern_size, ShowCorners=False):
             # cv2.imwrite("DetectedCorners/DetectedCorners" + str(i) + ".png", image)
 
             IndexWithImg.append(i)
-            i = i + 1
         else:
             print("No chessboard found in image: ", i)
-            i = i + 1
+        i += 1
     return chessboard_corners, IndexWithImg
 
 
@@ -123,30 +123,26 @@ def read_joints(file):
     with open(file, "r") as f:
         for line in f.readlines():
             line = line.strip('\n')
-            # line = line.replace(" ", "")
-
             line_data = line.split(' ')
             point = []
             for data in line_data:
                 data = data.replace(",", "")
                 point.append(float(data))
-
             endposes.append(point)
-
     return endposes
 
+
+# ----- Setup Section -----
 Setup603 = False
 SetupMechEye = False
-SetupPatternSize6 = True
-num_group = 0
-group_lists = []
-
+SetupPatternSize6 = False
 
 posefile_path = "./aT3s_opt.npy"
 if Setup603:
     image_folder = "./handeye_data/data_images"
     pose_folder = "./handeye_data/data_robot"
     group_lists = ["group1", "group2", "group3", "group4", "group5", "group6"]
+    all_pose_groups = group_lists
 else:
     if SetupMechEye:
         image_folder = "./handeye_data/data_mecheye"
@@ -154,11 +150,25 @@ else:
         image_folder = "./handeye_data/data_photoneo"
     pose_folder = "./handeye_data/data_nachi"
     if SetupPatternSize6:
-        group_lists = [ "group3", "group4"]
+        # Tracker (or calibration) poses are provided only for the following groups:
+        group_lists = ["group3", "group4"]
+        # Robot poses exist for more groups:
+        all_pose_groups = ["group1", "group2", "group3", "group4", "group5", "group6"]
     else:
         group_lists = ["group1", "group2", "group3", "group4", "group5", "group6"]
+        all_pose_groups = group_lists
 
-num_group = len(group_lists)
+print(f"Tracker pose groups (group_lists): {group_lists}")
+print(f"Robot pose groups (all_pose_groups): {all_pose_groups}")
+
+# Load tracker poses (tracker_T_3s)
+print(f"Pose file path: {posefile_path}")
+tracker_T_3s = np.load(posefile_path)
+print("Tracker Pose:")
+for each in enumerate(tracker_T_3s):
+    print(each)
+
+# Read all images from the tracker groups
 images = []
 for group in group_lists:
     image_files = sorted(glob.glob(f'{image_folder}/{group}/*.png'))
@@ -176,30 +186,23 @@ else:
 ShowProjectError = True
 ShowCorners = False
 
-# tracker_T_3 poses
-print(f"Pose file path:", posefile_path)
-tracker_T_3s = np.load(posefile_path)
-print(f"Tracker Pose:")
-for each in enumerate(tracker_T_3s):
-    print(each)
-
-# camera calibration
+# ----- Camera Calibration using Tracker Images -----
 chessboard_corners, IndexWithImg = find_chessboard_corners(images, pattern_size, ShowCorners=ShowCorners)
 intrinsic_matrix, dist = calculate_intrinsics(chessboard_corners, IndexWithImg,
-                                        pattern_size, square_size,
-                                        images[0].shape[:2][::-1], ShowProjectError=ShowProjectError)
-
-
+                                              pattern_size, square_size,
+                                              images[0].shape[:2][::-1], ShowProjectError=ShowProjectError)
 
 # Calculate camera extrinsics
 RTarget2Cam, TTarget2Cam = compute_camera_poses(chessboard_corners, pattern_size, square_size, intrinsic_matrix, dist)
 
-# Create a list to track which tracker pose to use for each group
-tracker_pose_indices = []
-for i in range(len(group_lists)):
-    # uses the last available tracker pose for any group index that would exceed the bounds.
-    tracker_pose_index = min(i, len(tracker_T_3s) - 1)
-    tracker_pose_indices.append(tracker_pose_index)
+# --- Revised Tracker-to-Robot Pose Mapping Section ---
+# filter the robot pose groups and only process those that have tracker data available.
+valid_pose_groups = [group for group in all_pose_groups if group in group_lists]
+tracker_pose_indices = {group: group_lists.index(group) for group in valid_pose_groups}
+
+print("Valid mapping from robot pose groups to tracker pose indices:")
+print(tracker_pose_indices)
+# ----------------------------------------------------
 
 REnd2Base = []
 TEnd2Base = []
@@ -226,12 +229,13 @@ else:
     ])
 robot = RobotSerial(dh_params)
 
-for group_idx, group in enumerate(group_lists):
+# Process only valid pose groups (those with tracker data available)
+for group in valid_pose_groups:
     pose_file = f'{pose_folder}/{group}.txt'
     pose_group = read_joints(pose_file)
     
-    # Use the mapped tracker pose index
-    tracker_pose_index = tracker_pose_indices[group_idx]
+    # Use the mapping computed above to select the tracked pose index.
+    tracker_pose_index = tracker_pose_indices[group]
 
     for pose in pose_group:
         f = robot.forward(np.array(pose))
@@ -241,11 +245,10 @@ for group_idx, group in enumerate(group_lists):
         for j in range(3, 6):
             Link3TEnd_i = Link3TEnd_i.dot(Ts[j].t_4_4)
 
-        # Use the mapped tracker pose index instead of group_idx
+        # Multiply the tracker pose (selected by the mapping) with the product of forward kinematics.
         T = tracker_T_3s[tracker_pose_index].dot(Link3TEnd_i)
         REnd2Base.append(T[:3, :3])
         TEnd2Base.append(T[:3, 3])
-
 
 REnd2Base = np.array(REnd2Base)
 TEnd2Base = np.array(TEnd2Base)
@@ -254,6 +257,13 @@ TEnd2Base = np.array(TEnd2Base)
 # print("TEnd2Base: ", TEnd2Base)
 # print("RTarget2Cam: ", RTarget2Cam)
 # print("TTarget2Cam: ", TTarget2Cam)
+
+# Before calling cv2.calibrateHandEye, ensure the arrays have the same length
+min_length = min(len(REnd2Base), len(RTarget2Cam))
+REnd2Base = REnd2Base[:min_length]
+TEnd2Base = TEnd2Base[:min_length]
+RTarget2Cam = RTarget2Cam[:min_length]
+TTarget2Cam = TTarget2Cam[:min_length]
 
 R_cam2gripper, t_cam2gripper = cv2.calibrateHandEye(
     REnd2Base,
@@ -274,10 +284,10 @@ print("end_T_cam: ", end_T_cam)
 #                      [0.00278326, -0.00568221, 0.99997998, 0.12970971],
 #                      [0, 0, 0, 1]])
 
-# 16w
-# end_T_cam:  [[-0.00100795  0.99996224 -0.00863107 -0.03627546]
-#  [-0.96579093  0.00126477  0.25931886 -0.11289998]
-#  [ 0.25931998  0.00859719  0.9657532   0.11992202]
+# 16w 2025-01-17
+# end_T_cam:  [[-0.00105313  0.99996221 -0.00862912 -0.03626875]
+#  [-0.96579455  0.00122052  0.25930562 -0.11289032]
+#  [ 0.25930635  0.00860704  0.96575677  0.11992572]
 #  [ 0.          0.          0.          1.        ]]
 
 # 16w 2025-02-04
@@ -291,3 +301,9 @@ print("end_T_cam: ", end_T_cam)
 #  [-9.99978640e-01  6.52442644e-03 -3.88847118e-04 -4.19321620e-02]
 #  [-4.52494518e-04 -9.75660970e-03  9.99952301e-01  7.64250999e-02]
 #  [ 0.00000000e+00  0.00000000e+00  0.00000000e+00  1.00000000e+00]]
+
+# 2025-02-24 photoneo
+# end_T_cam:  [[-0.00280774 -0.99993985  0.01060246  0.03759239]
+#  [ 0.96403859 -0.00552423 -0.26570487  0.11280878]
+#  [ 0.26574746  0.00947515  0.96399612  0.12180479]
+#  [ 0.          0.          0.          1.        ]]
