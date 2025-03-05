@@ -135,7 +135,7 @@ def read_joints(file):
 # ----- Setup Section -----
 Setup603 = False
 SetupMechEye = False
-SetupPatternSize6 = False
+OnlyGroup3n4 = False
 
 posefile_path = "./aT3s_opt.npy"
 if Setup603:
@@ -149,7 +149,7 @@ else:
     else:
         image_folder = "./handeye_data/data_photoneo"
     pose_folder = "./handeye_data/data_nachi"
-    if SetupPatternSize6:
+    if OnlyGroup3n4:
         # Tracker (or calibration) poses are provided only for the following groups:
         group_lists = ["group3", "group4"]
         # Robot poses exist for more groups:
@@ -179,7 +179,7 @@ pattern_size = (11, 8)
 if Setup603:
     square_size = 10 / 1000
 else:
-    if SetupPatternSize6:
+    if OnlyGroup3n4:
         square_size = 6 / 1000
     else:
         square_size = 15 / 1000
@@ -306,4 +306,14 @@ print("end_T_cam: ", end_T_cam)
 # end_T_cam:  [[-0.00280774 -0.99993985  0.01060246  0.03759239]
 #  [ 0.96403859 -0.00552423 -0.26570487  0.11280878]
 #  [ 0.26574746  0.00947515  0.96399612  0.12180479]
+#  [ 0.          0.          0.          1.        ]]
+
+# 2025-02-24 photoneo v2
+# The projection error from the calibration is:  0.010495365167986784
+# Valid mapping from robot pose groups to tracker pose indices:
+# {'group1': 0, 'group2': 1, 'group3': 2, 'group4': 3, 'group5': 4, 'group6': 5}
+# QStandardPaths: XDG_RUNTIME_DIR not set, defaulting to '/tmp/runtime-hkclr'
+# end_T_cam:  [[-0.15574418 -0.98077204  0.11760079 -0.14335974]
+#  [ 0.90361027 -0.18955117 -0.38413388  0.52448638]
+#  [ 0.39903914  0.04643866  0.91575718 -0.40286519]
 #  [ 0.          0.          0.          1.        ]]

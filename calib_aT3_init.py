@@ -210,7 +210,7 @@ def solve_3Ta_R(est_3Ta_t_iter, est_6p_iter, Link3TEnds, marker_points):
 
 if __name__ == "__main__":
     Setup603 = False
-    SetupPatternSize6 = False
+    OnlyGroup3n4 = False
 
     N_group = 0
     group_lists = []
@@ -228,7 +228,7 @@ if __name__ == "__main__":
                             [0.1025, 0., 0.5 * pi, 0.],
                             [0.094, 0., 0., 0.]])
     else:
-        if SetupPatternSize6:
+        if OnlyGroup3n4:
             group_lists = [ "group3", "group4"]
         else:
             group_lists = ["group1", "group2", "group3", "group4", "group5", "group6"]

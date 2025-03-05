@@ -150,7 +150,7 @@ def read_joints(file):
 
 Setup603 = False
 SetupMechEye = False
-SetupPatternSize6 = False
+OnlyGroup3n4 = False
 group_lists = []
 
 if Setup603:
@@ -163,7 +163,7 @@ else:
         image_folder = "./handeye_data/data_mecheye"
     else:
         image_folder = "./handeye_data/data_photoneo"
-    if SetupPatternSize6:
+    if OnlyGroup3n4:
         square_size = 6 / 1000
     else:
         square_size = 15 / 1000
@@ -323,3 +323,13 @@ print("Distortion: ", dist)
 #  [0.00000000e+00 2.24714713e+03 7.80309743e+02]
 #  [0.00000000e+00 0.00000000e+00 1.00000000e+00]]
 # Distortion:  [[-0.15319278  0.29214735 -0.00036029  0.00047065 -0.34778661]]
+
+# 2025-02-24 photoneo v2
+# end_T_cam:  [[-0.04423496 -0.99901788  0.00255733  0.05719259]
+#  [ 0.95842326 -0.04315954 -0.28206755  0.27836189]
+#  [ 0.2819009  -0.01002624  0.95939114 -0.53584164]
+#  [ 0.          0.          0.          1.        ]]
+# Intrinsics:  [[2.24844931e+03 0.00000000e+00 1.02513974e+03]
+#  [0.00000000e+00 2.24714698e+03 7.80309845e+02]
+#  [0.00000000e+00 0.00000000e+00 1.00000000e+00]]
+# Distortion:  [[-0.15319236  0.29214266 -0.00036031  0.00047066 -0.34777189]
