@@ -17,8 +17,8 @@ int run6DoFHandEyeCalibration(const Config &config) {
     cv::Size image_size; 
 
     // Process each group from the configuration.
+    std::cout << "[run6DoFHandEyeCalibration]image_folder: " << config.image_folder << std::endl;
     for (const auto &group : config.group_lists) {
-        std::cout << "image_folder: " << config.image_folder << std::endl;
         std::string image_group_folder = config.image_folder + "/" + group;
         auto images = read_images(image_group_folder);
         if (images.empty()) {

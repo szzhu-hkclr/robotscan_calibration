@@ -5,7 +5,7 @@
 int main(int argc, char **argv) {
     if (argc < 3) {
         std::cerr << "Usage: " << argv[0] << " <command> <config.json>" << std::endl;
-        std::cerr << "Available commands: hand_eye, other" << std::endl;
+        std::cerr << "Available commands: 6dof, new and err" << std::endl;
         return -1;
     }
 
