@@ -136,9 +136,6 @@ def get_angular_error(R_gt, R_est):
     # theta = 2 * np.arcsin(N/(2*np.sqrt(2)))
     # return theta*180.0/np.pi
 
-
-
-
 def compute_transformation_diff(R_est, t_est, R_gt, t_gt):
     """
     Compute difference between two 4-by-4 SE3 transformation matrix
@@ -149,28 +146,12 @@ def compute_transformation_diff(R_est, t_est, R_gt, t_gt):
     return rot_error, trans_error
 
 
-def s(choice):
-    if choice == 1:
-        return "你选择了 1"
-    elif choice == 2:
-        return "你选择了 2"
-    elif choice == 3:
-        return "你选择了 3"
-    else:
-        return "无效选项"
-
-
-
-
-
-
-
 if __name__ == '__main__':
     Setup603 = True
     if Setup603:
         square_size = 10.0 / 1000.0
-        image_folder = "./evaluate_data/603_data/image_data"
-        robotfile_path = os.path.join("./evaluate_data/603_data/robot_data.txt")
+        image_folder = "./pc_registration/2025-03-14_image_data"
+        robotfile_path = os.path.join("./pc_registration/2025-03-14_robot_data.txt")
         intrinsic_matrix = np.array([[2.27516924e+03 ,0.00000000e+00, 1.41300356e+03],
                                     [0.00000000e+00 ,2.27392348e+03 ,8.94726558e+02],
                                     [0.00000000e+00 ,0.00000000e+00 ,1.00000000e+00]])
@@ -180,30 +161,16 @@ if __name__ == '__main__':
     else:
         # for photoneo
         square_size = 15.0 / 1000.0
-        image_folder = "./evaluate_data/16w_data/image_data"
-        robotfile_path = os.path.join("./evaluate_data/16w_data/robot_data.txt") 
-        intrinsic_matrix = np.array([[2.25440215e+03, 0.00000000e+00, 1.01973176e+03],
-                            [0.00000000e+00, 2.25463544e+03, 7.81230232e+02],
-                            [0.00000000e+00, 0.00000000e+00, 1.00000000e+00]])
-
-        dist = np.array([[-1.49251417e-01,  2.47196855e-01,  1.43052000e-04,  3.07685596e-05,-2.17918466e-01]])
-        R_mtx_photoneo=np.array([[-0.7112,-0.6142,-0.3419],
-                        [0.6351,-0.7699,0.0620],
-                        [-0.3013,-0.1731,0.9377]])
-        
-        t_mtx_photoneo=np.array([0.1922,0.1775,0.0471]) #unit:m
+        image_folder = "./pc_registration/2025-03-18_image_data"
+        robotfile_path = os.path.join("./pc_registration/2025-03-18_robot_data .txt") 
+        intrinsic_matrix = np.array([[2.25440219e+03, 0.00000000e+00, 1.01973189e+03],
+                                     [0.00000000e+00, 2.25463546e+03, 7.81230173e+02],
+                                     [0.00000000e+00, 0.00000000e+00, 1.00000000e+00]])
+        dist = np.array([[-1.49250762e-01,  2.47190731e-01,  1.43050079e-04,  3.07944308e-05, -2.17900844e-01]])      
 
 
-        # for mecheye
-        # square_size = 15.0 / 1000.0
-        # image_folder = "./evaluate_data/16w_data/mecheye/image_data"
-        # robotfile_path = os.path.join("./evaluate_data/16w_data/mecheye/robot_data.txt") 
-        # intrinsic_matrix=np.array ([[2.28057905e+03, 0.00000000e+00, 1.40806930e+03],
-        # [0.00000000e+00 ,2.28009062e+03, 8.93363183e+02],
-        # [0.00000000e+00 ,0.00000000e+00 ,1.00000000e+00]])
-        # dist=np.array ( [[-0.0024286 ,  0.02331866 ,-0.00018822 , 0.00046116, -0.07620117]]
 
-    ply_files = sorted(glob.glob(f'{image_folder}/*_origin.ply'))
+    ply_files = sorted(glob.glob(f'{image_folder}/*.ply'))
 
 #------------------------------------------------------------------------------------------------------------
     ### robot_data
@@ -245,10 +212,10 @@ if __name__ == '__main__':
         #                     [-9.65813693e-01,  1.82728409e-03,  2.59230732e-01, -1.12813118e-01],
         #                     [ 2.59236747e-01,  8.61727592e-03,  9.65775363e-01,  1.20060987e-01],
         #                     [ 0.00000000e+00,  0.00000000e+00,  0.00000000e+00,  1.00000000e+00]])
-        end_T_cam_ori=np.array([[ 6.94659831e-03,  9.99926935e-01,  9.89287869e-03,  7.35210499e-02],
-        [-9.99975838e-01,  6.94883652e-03, -1.91889404e-04, -4.20011913e-02],
-        [-2.60619381e-04, -9.89130668e-03,  9.99951046e-01,  7.58737362e-02],
-        [ 0.00000000e+00,  0.00000000e+00,  0.00000000e+00,  1.00000000e+00]])
+        end_T_cam_ori = np.array([[-0.00100795,  0.99996224, -0.00863107, -0.03627546],
+                                  [-0.96579093,  0.00126477,  0.25931886, -0.11289998],
+                                  [ 0.25931998,  0.00859719,  0.9657532,   0.11992202],
+                                  [ 0.,          0.,          0.,          1.        ]])
 
     robot_aubo_ori = RobotSerial(dh_params)
 
@@ -290,15 +257,18 @@ if __name__ == '__main__':
                             [9.4042644e-02 ,-2.6792093e-05 ,-1.4009298e-04 , 2.6618787e-05]])
     else:
         dh_params_new = np.array([[0.550, 0.170, 0.5*pi, 0.0],
-                          [0.0, 0.880, 0.0, 0.5*pi],
-                          [0.0, 0.190, 0.5*pi, 0.0],
-                          [8.1010062e-01, -3.6424387e-04, -1.5701164e+00, 1.7728833e-05],
-                          [1.2373853e-04, 1.2213732e-04, 1.5702524e+00, 5.3631893e-04],               #
-                          [1.1499943e-01, -1.5186303e-06, -2.6259433e-05,  7.6398765e-06]])
+                            [0.0, 0.880, 0.0, 0.5*pi],
+                            [0.0, 0.190, 0.5*pi, 0.0],
+                            [8.10100675e-01, -3.19175801e-04, -1.57020402e+00,  1.19046235e-05],
+                            [1.4248221e-04, 1.2206167e-04, 1.5704311e+00, 3.1969816e-04],
+                            [1.1500100e-01,  4.0665665e-07, -4.1013078e-05,  1.0535180e-05]])
     robot_aubo_new = RobotSerial(dh_params_new)
 
     # tracker_T_3 poses
-    posefile_path = "./aT3s_opt.npy"
+    if Setup603:
+        posefile_path = "./2025-03-14_aT3s_opt.npy"
+    else:
+        posefile_path = "./aT3s_opt.npy"
     tracker_T_3s = np.load(posefile_path)
     if Setup603:
         end_T_cam =np.array([[ 0.99986931 ,-0.01605259 , 0.0019194 ,  0.04138638],
@@ -307,11 +277,10 @@ if __name__ == '__main__':
  [ 0.  ,        0.     ,     0.     ,     1.        ]])
     else:
         # for 16W photoneo setup
-        end_T_cam=np.array([[-1.33946016e-03,  9.99962119e-01, -8.60038500e-03, -3.63372197e-02],
-                            [-9.65772017e-01,  9.37282195e-04,  2.59390694e-01, -1.12871821e-01],
-                            [ 2.59388929e-01,  8.65345467e-03,  9.65734177e-01,  1.19948724e-01],
-                            [ 0.00000000e+00,  0.00000000e+00,  0.00000000e+00,  1.00000000e+00]])
-       
+        end_T_cam = np.array([[-4.69196201e-04,  9.99961201e-01, -8.79633495e-03, -3.60227528e-02],
+                              [-9.65813707e-01,  1.82719465e-03,  2.59230678e-01, -1.12813121e-01],
+                              [ 2.59236693e-01,  8.61725091e-03,  9.65775378e-01,  1.20060964e-01],
+                              [ 0.00000000e+00,  0.00000000e+00,  0.00000000e+00,  1.00000000e+00]])
 
     tracker_T_camidxs = []
     for idx in range(len(robot_states)):
